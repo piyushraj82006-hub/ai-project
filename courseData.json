@@ -1,0 +1,905 @@
+{
+  "courses": [
+    {
+      "code": "BCSE302L",
+      "name": "Software Engineering",
+      "department": "CSE",
+      "semester": "5",
+      "credits": "4",
+      "description": "Comprehensive course covering software engineering principles, methodologies, and practices including requirements engineering, software design, testing strategies, and project management.",
+      "modules": [
+        {
+          "title": "Introduction to Software Engineering",
+          "description": "Covers software crisis, process models (Waterfall, Agile, Scrum, XP), and the evolution of SE practices.",
+          "topics": ["Software Crisis", "Process Models", "Waterfall Model", "Agile Methodology", "Scrum & XP"],
+          "hours": "5"
+        },
+        {
+          "title": "Requirements Engineering",
+          "description": "Techniques for gathering, analyzing, and documenting software requirements using SRS documents and use cases.",
+          "topics": ["Elicitation Techniques", "SRS Document", "Use Case Diagrams", "User Stories", "Requirements Validation"],
+          "hours": "6"
+        },
+        {
+          "title": "Software Design",
+          "description": "Architectural design principles, Gang of Four design patterns, and UML modeling techniques.",
+          "topics": ["Software Architecture", "Design Patterns", "UML Class Diagrams", "Sequence Diagrams", "Component Design"],
+          "hours": "7"
+        },
+        {
+          "title": "Software Testing",
+          "description": "Testing methodologies from unit to system level, including TDD and test automation.",
+          "topics": ["Unit Testing", "Integration Testing", "System Testing", "TDD", "Black & White Box Testing"],
+          "hours": "6"
+        },
+        {
+          "title": "Project Management",
+          "description": "Estimation techniques, scheduling, risk management, and configuration management.",
+          "topics": ["COCOMO Model", "Project Scheduling", "Risk Management", "Configuration Management", "Quality Assurance"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Software Engineering Full Course", "url": "https://www.youtube.com/watch?v=uJpQHWJGJbQ", "moduleIndex": 0 },
+        { "title": "Agile vs Waterfall", "url": "https://www.youtube.com/watch?v=GzzkpAOxHXs", "moduleIndex": 0 },
+        { "title": "Requirements Engineering", "url": "https://www.youtube.com/watch?v=DLnS4K7P-xs", "moduleIndex": 1 },
+        { "title": "UML Diagrams Tutorial", "url": "https://www.youtube.com/watch?v=WnMQ8HlmeXc", "moduleIndex": 2 },
+        { "title": "Design Patterns in 8 Minutes", "url": "https://www.youtube.com/watch?v=tAuRQs_d9F8", "moduleIndex": 2 },
+        { "title": "Software Testing Explained", "url": "https://www.youtube.com/watch?v=u6QfIXgjwGQ", "moduleIndex": 3 },
+        { "title": "COCOMO Model Explained", "url": "https://www.youtube.com/watch?v=W_x8wZ9dFxU", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain the differences between Waterfall and Agile models.", "answer": "Waterfall is sequential (requirements → design → code → test → deploy) with no going back. Agile is iterative, delivering working software in 2-4 week sprints with continuous feedback. Waterfall suits well-defined projects; Agile handles changing requirements.", "moduleIndex": 0 },
+        { "question": "What is an SRS document? List its components.", "answer": "Software Requirements Specification (SRS) formally documents all functional and non-functional requirements. Components: Introduction, Overall Description, Specific Requirements (functional, performance, design constraints), External Interface Requirements, and Appendices.", "moduleIndex": 1 },
+        { "question": "Describe the SOLID principles in software design.", "answer": "S: Single Responsibility — one class, one job. O: Open/Closed — open for extension, closed for modification. L: Liskov Substitution — subtypes must be substitutable. I: Interface Segregation — many specific interfaces > one general. D: Dependency Inversion — depend on abstractions.", "moduleIndex": 2 },
+        { "question": "Compare Black Box and White Box testing.", "answer": "Black Box: tests functionality without knowing internal code (equivalence partitioning, boundary value). White Box: tests internal logic with code knowledge (statement, branch, path coverage). Both are essential for comprehensive testing.", "moduleIndex": 3 },
+        { "question": "Explain the COCOMO estimation model.", "answer": "Constructive Cost Model estimates effort (person-months) and schedule from project size (KLOC). Three levels: Basic (effort = a × KLOC^b), Intermediate (adds cost drivers), Detailed (phase-level estimation). Organic, semi-detached, and embedded project types.", "moduleIndex": 4 }
+      ]
+    },
+    {
+      "code": "BCSE303L",
+      "name": "Database Management Systems",
+      "department": "CSE",
+      "semester": "4",
+      "credits": "4",
+      "description": "Fundamentals of database systems covering relational model, SQL, normalization, transaction management, and NoSQL concepts.",
+      "modules": [
+        {
+          "title": "Introduction to DBMS",
+          "description": "Database concepts, data models, schema architecture, and database system architecture.",
+          "topics": ["Data Models", "Three-Schema Architecture", "ER Model", "Database Languages", "DBMS Architecture"],
+          "hours": "5"
+        },
+        {
+          "title": "Relational Model & SQL",
+          "description": "Relational algebra, SQL queries (DDL, DML, DCL), joins, subqueries, and views.",
+          "topics": ["Relational Algebra", "SQL DDL/DML", "Joins", "Subqueries", "Views & Indexes"],
+          "hours": "8"
+        },
+        {
+          "title": "Normalization",
+          "description": "Functional dependencies, normal forms (1NF to BCNF), and decomposition techniques.",
+          "topics": ["Functional Dependencies", "1NF", "2NF", "3NF", "BCNF", "Decomposition"],
+          "hours": "6"
+        },
+        {
+          "title": "Transaction Management",
+          "description": "ACID properties, concurrency control, locking protocols, and recovery mechanisms.",
+          "topics": ["ACID Properties", "Serializability", "Two-Phase Locking", "Deadlock Handling", "Recovery Techniques"],
+          "hours": "6"
+        },
+        {
+          "title": "Advanced Topics",
+          "description": "Indexing, hashing, NoSQL databases, and distributed databases overview.",
+          "topics": ["B+ Trees", "Hashing", "NoSQL (MongoDB)", "Distributed Databases", "CAP Theorem"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "DBMS Full Course", "url": "https://www.youtube.com/watch?v=kBdlM6hNDAE", "moduleIndex": 0 },
+        { "title": "SQL Tutorial for Beginners", "url": "https://www.youtube.com/watch?v=HXV3zeQKqGY", "moduleIndex": 1 },
+        { "title": "Normalization Explained", "url": "https://www.youtube.com/watch?v=UrYLYV7WSHM", "moduleIndex": 2 },
+        { "title": "ACID Properties", "url": "https://www.youtube.com/watch?v=GAe5oB742dw", "moduleIndex": 3 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain the three-schema architecture of DBMS.", "answer": "External Schema (user views), Conceptual Schema (logical structure of entire DB), Internal Schema (physical storage). Provides data independence — changes at one level don't affect others.", "moduleIndex": 0 },
+        { "question": "Write SQL for the following: Find employees earning more than the average salary.", "answer": "SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees);", "moduleIndex": 1 },
+        { "question": "Differentiate between 3NF and BCNF.", "answer": "3NF: For every FD X→Y, either X is a superkey OR Y is a prime attribute. BCNF: For every FD X→Y, X must be a superkey (stricter). BCNF eliminates all redundancy from FDs but may lose dependency preservation.", "moduleIndex": 2 },
+        { "question": "Explain Two-Phase Locking protocol.", "answer": "Growing Phase: transaction acquires locks, no releases. Shrinking Phase: transaction releases locks, no new acquisitions. Guarantees serializability but may cause deadlocks. Strict 2PL holds all exclusive locks until commit.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BCSE301L",
+      "name": "Data Structures and Algorithms",
+      "department": "CSE",
+      "semester": "3",
+      "credits": "4",
+      "description": "Core course on data structures (arrays, linked lists, trees, graphs) and algorithms (sorting, searching, dynamic programming, greedy).",
+      "modules": [
+        {
+          "title": "Linear Data Structures",
+          "description": "Arrays, linked lists, stacks, queues, and their applications.",
+          "topics": ["Arrays", "Linked Lists", "Stacks", "Queues", "Deque"],
+          "hours": "6"
+        },
+        {
+          "title": "Trees",
+          "description": "Binary trees, BST, AVL trees, heaps, and tree traversals.",
+          "topics": ["Binary Trees", "BST", "AVL Trees", "Heaps", "Tree Traversals"],
+          "hours": "7"
+        },
+        {
+          "title": "Graphs",
+          "description": "Graph representations, BFS, DFS, shortest paths, and spanning trees.",
+          "topics": ["BFS & DFS", "Dijkstra's Algorithm", "Prim's & Kruskal's", "Topological Sort", "Bellman-Ford"],
+          "hours": "7"
+        },
+        {
+          "title": "Sorting & Searching",
+          "description": "Comparison and non-comparison sorting algorithms, binary search variants.",
+          "topics": ["Quick Sort", "Merge Sort", "Heap Sort", "Counting Sort", "Binary Search"],
+          "hours": "5"
+        },
+        {
+          "title": "Algorithm Design Paradigms",
+          "description": "Divide and conquer, dynamic programming, greedy algorithms, and backtracking.",
+          "topics": ["Divide & Conquer", "Dynamic Programming", "Greedy Algorithms", "Backtracking", "Time Complexity Analysis"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "DSA Full Course", "url": "https://www.youtube.com/watch?v=8hly31xKli0", "moduleIndex": 0 },
+        { "title": "Binary Trees Explained", "url": "https://www.youtube.com/watch?v=oSWTXtMglKE", "moduleIndex": 1 },
+        { "title": "Graph Algorithms", "url": "https://www.youtube.com/watch?v=tWVWeAqZ0WU", "moduleIndex": 2 },
+        { "title": "Dynamic Programming", "url": "https://www.youtube.com/watch?v=oBt53YbR9Kk", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Compare stack and queue data structures.", "answer": "Stack: LIFO (Last In First Out), push/pop at top. Queue: FIFO (First In First Out), enqueue at rear, dequeue at front. Stack uses: function calls, undo. Queue uses: BFS, scheduling.", "moduleIndex": 0 },
+        { "question": "Explain AVL tree rotations.", "answer": "AVL trees maintain balance factor (-1, 0, 1) at every node. Four rotations: LL (right rotate), RR (left rotate), LR (left-right rotate), RL (right-left rotate). Time complexity for all ops: O(log n).", "moduleIndex": 1 },
+        { "question": "Compare BFS and DFS traversals.", "answer": "BFS: Level-order using queue, finds shortest path in unweighted graphs, O(V+E). DFS: Depth-first using stack/recursion, used for cycle detection and topological sort, O(V+E).", "moduleIndex": 2 },
+        { "question": "Explain the concept of Dynamic Programming with an example.", "answer": "DP solves problems by breaking into overlapping subproblems and storing results (memoization/tabulation). Example: Fibonacci — fib(n) = fib(n-1) + fib(n-2). Without DP: O(2^n). With DP: O(n).", "moduleIndex": 4 }
+      ]
+    },
+    {
+      "code": "BECE301L",
+      "name": "Digital Logic Design",
+      "department": "ECE",
+      "semester": "3",
+      "credits": "4",
+      "description": "Fundamentals of digital electronics including Boolean algebra, combinational and sequential circuits, and memory systems.",
+      "modules": [
+        {
+          "title": "Number Systems & Boolean Algebra",
+          "description": "Binary, octal, hexadecimal systems, Boolean algebra theorems, and K-Maps.",
+          "topics": ["Number Systems", "Boolean Algebra", "De Morgan's Theorems", "K-Maps", "Canonical Forms"],
+          "hours": "6"
+        },
+        {
+          "title": "Combinational Circuits",
+          "description": "Adders, subtractors, multiplexers, decoders, and encoders.",
+          "topics": ["Half & Full Adder", "MUX & DEMUX", "Encoders & Decoders", "Comparators", "Code Converters"],
+          "hours": "7"
+        },
+        {
+          "title": "Sequential Circuits",
+          "description": "Flip-flops, registers, counters, and state machines.",
+          "topics": ["SR, D, JK, T Flip-Flops", "Registers", "Counters", "State Machines", "Mealy & Moore Models"],
+          "hours": "7"
+        },
+        {
+          "title": "Memory & PLDs",
+          "description": "ROM, RAM, PLAs, PALs, and FPGAs.",
+          "topics": ["ROM", "RAM (SRAM, DRAM)", "PLA & PAL", "FPGA Basics", "Memory Hierarchy"],
+          "hours": "5"
+        },
+        {
+          "title": "Digital System Design",
+          "description": "ASM charts, RTL design, and introduction to HDL (Verilog).",
+          "topics": ["ASM Charts", "RTL Design", "Verilog Basics", "Datapath Design", "Control Unit"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Digital Logic Full Course", "url": "https://www.youtube.com/watch?v=M0mx8S05v60", "moduleIndex": 0 },
+        { "title": "K-Map Simplification", "url": "https://www.youtube.com/watch?v=RO5alU6PpSU", "moduleIndex": 0 },
+        { "title": "Flip Flops Explained", "url": "https://www.youtube.com/watch?v=Hi7rK0hZnfc", "moduleIndex": 2 }
+      ],
+      "importantQuestions": [
+        { "question": "Simplify F(A,B,C) = Σm(0,1,2,5,7) using K-Map.", "answer": "Group: m(0,1) → A'B', m(5,7) → AC, m(1,5) → B'C. Result: F = A'B' + AC + B'C (or further simplified).", "moduleIndex": 0 },
+        { "question": "Design a 4-bit binary adder using full adders.", "answer": "Cascade 4 full adders: C_out of each stage connects to C_in of next. First C_in = 0 for addition. Produces 4-bit sum + carry out. Ripple carry adder with propagation delay of 4 × gate_delay.", "moduleIndex": 1 },
+        { "question": "Compare Mealy and Moore state machines.", "answer": "Moore: outputs depend only on current state (output on state). Mealy: outputs depend on current state AND inputs (output on transitions). Moore needs more states but is simpler; Mealy responds faster.", "moduleIndex": 2 }
+      ]
+    },
+    {
+      "code": "BCSE304L",
+      "name": "Operating Systems",
+      "department": "CSE",
+      "semester": "4",
+      "credits": "4",
+      "description": "Core OS concepts including process management, memory management, file systems, and synchronization.",
+      "modules": [
+        {
+          "title": "Process Management",
+          "description": "Processes, threads, CPU scheduling algorithms, and process synchronization.",
+          "topics": ["Process Lifecycle", "Threads", "CPU Scheduling", "FCFS, SJF, RR", "Priority Scheduling"],
+          "hours": "7"
+        },
+        {
+          "title": "Synchronization",
+          "description": "Critical section, semaphores, monitors, and classic synchronization problems.",
+          "topics": ["Critical Section", "Mutex & Semaphores", "Monitors", "Producer-Consumer", "Dining Philosophers"],
+          "hours": "6"
+        },
+        {
+          "title": "Deadlocks",
+          "description": "Deadlock conditions, prevention, avoidance (Banker's algorithm), and detection.",
+          "topics": ["Deadlock Conditions", "Resource Allocation Graph", "Banker's Algorithm", "Deadlock Detection", "Recovery"],
+          "hours": "5"
+        },
+        {
+          "title": "Memory Management",
+          "description": "Paging, segmentation, virtual memory, and page replacement algorithms.",
+          "topics": ["Paging", "Segmentation", "Virtual Memory", "Page Replacement (FIFO, LRU, Optimal)", "Thrashing"],
+          "hours": "7"
+        },
+        {
+          "title": "File Systems & I/O",
+          "description": "File organization, directory structure, disk scheduling, and I/O management.",
+          "topics": ["File Allocation", "Directory Structure", "FCFS, SSTF, SCAN", "RAID", "I/O Subsystem"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Operating Systems Full Course", "url": "https://www.youtube.com/watch?v=bkSWJJZNgf8", "moduleIndex": 0 },
+        { "title": "Process Synchronization", "url": "https://www.youtube.com/watch?v=ph2awKa8r5Y", "moduleIndex": 1 },
+        { "title": "Banker's Algorithm", "url": "https://www.youtube.com/watch?v=bYFVbzMrViM", "moduleIndex": 2 },
+        { "title": "Virtual Memory Explained", "url": "https://www.youtube.com/watch?v=qlH4-oHnBb8", "moduleIndex": 3 }
+      ],
+      "importantQuestions": [
+        { "question": "Compare preemptive and non-preemptive scheduling.", "answer": "Preemptive: OS can interrupt a running process (RR, SRTF, Priority Preemptive). Non-preemptive: process runs until completion or voluntary yield (FCFS, SJF). Preemptive provides better response time; non-preemptive is simpler.", "moduleIndex": 0 },
+        { "question": "Explain the Banker's Algorithm with an example.", "answer": "Safety algorithm checks if a safe sequence exists. For each process, check if Need ≤ Available. If yes, allocate, run, release resources. If all processes can finish, state is safe. Prevents deadlock by refusing unsafe requests.", "moduleIndex": 2 },
+        { "question": "Compare FIFO, LRU, and Optimal page replacement.", "answer": "FIFO: replace oldest page, simple but Belady's anomaly. LRU: replace least recently used, good performance, O(n) or hardware support needed. Optimal: replace page not used for longest future time — theoretical best, not implementable.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BCSE305L",
+      "name": "Computer Networks",
+      "department": "CSE",
+      "semester": "5",
+      "credits": "4",
+      "description": "Networking fundamentals covering OSI/TCP-IP models, protocols, routing, transport layer, and application layer.",
+      "modules": [
+        {
+          "title": "Introduction & Physical Layer",
+          "description": "Network types, OSI & TCP/IP models, transmission media, and encoding.",
+          "topics": ["Network Types", "OSI Model", "TCP/IP Model", "Transmission Media", "Encoding Techniques"],
+          "hours": "5"
+        },
+        {
+          "title": "Data Link Layer",
+          "description": "Framing, error detection/correction, MAC protocols, and Ethernet.",
+          "topics": ["Framing", "Error Detection (CRC)", "Flow Control", "CSMA/CD", "Ethernet & VLANs"],
+          "hours": "6"
+        },
+        {
+          "title": "Network Layer",
+          "description": "IP addressing, subnetting, routing algorithms, and protocols.",
+          "topics": ["IPv4 & IPv6", "Subnetting & CIDR", "Routing (RIP, OSPF, BGP)", "ARP & ICMP", "NAT"],
+          "hours": "7"
+        },
+        {
+          "title": "Transport Layer",
+          "description": "TCP, UDP, congestion control, and flow control mechanisms.",
+          "topics": ["TCP vs UDP", "Three-Way Handshake", "Congestion Control", "Sliding Window", "Port Numbers"],
+          "hours": "6"
+        },
+        {
+          "title": "Application Layer",
+          "description": "HTTP, DNS, SMTP, FTP, and network security basics.",
+          "topics": ["HTTP/HTTPS", "DNS", "SMTP & POP3", "FTP", "SSL/TLS Basics"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Computer Networks Full Course", "url": "https://www.youtube.com/watch?v=qiQR5rTSshw", "moduleIndex": 0 },
+        { "title": "OSI Model Explained", "url": "https://www.youtube.com/watch?v=vv4y_uOneC0", "moduleIndex": 0 },
+        { "title": "Subnetting Made Easy", "url": "https://www.youtube.com/watch?v=ecCuyq-Wprc", "moduleIndex": 2 },
+        { "title": "TCP vs UDP", "url": "https://www.youtube.com/watch?v=uwoD5YsGACg", "moduleIndex": 3 }
+      ],
+      "importantQuestions": [
+        { "question": "Compare OSI and TCP/IP models.", "answer": "OSI: 7 layers (Physical, Data Link, Network, Transport, Session, Presentation, Application) — theoretical reference model. TCP/IP: 4 layers (Network Access, Internet, Transport, Application) — practical implementation. TCP/IP merges top 3 OSI layers.", "moduleIndex": 0 },
+        { "question": "Explain the TCP three-way handshake.", "answer": "1) Client sends SYN (seq=x). 2) Server responds SYN-ACK (seq=y, ack=x+1). 3) Client sends ACK (ack=y+1). Connection established. Ensures both sides agree on sequence numbers. Four-way handshake for termination (FIN/ACK).", "moduleIndex": 3 },
+        { "question": "Subnet the network 192.168.1.0/24 into 4 subnets.", "answer": "Need 2 extra bits (2²=4). New mask: /26 (255.255.255.192). Subnets: 192.168.1.0/26, 192.168.1.64/26, 192.168.1.128/26, 192.168.1.192/26. Each has 62 usable hosts.", "moduleIndex": 2 }
+      ]
+    },
+    {
+      "code": "BCSE306L",
+      "name": "Theory of Computation",
+      "department": "CSE",
+      "semester": "5",
+      "credits": "3",
+      "description": "Formal languages, automata theory, computability, and complexity theory.",
+      "modules": [
+        {
+          "title": "Finite Automata",
+          "description": "DFA, NFA, epsilon-NFA, and equivalence between them.",
+          "topics": ["DFA", "NFA", "ε-NFA", "NFA to DFA Conversion", "DFA Minimization"],
+          "hours": "6"
+        },
+        {
+          "title": "Regular Languages",
+          "description": "Regular expressions, pumping lemma, and closure properties.",
+          "topics": ["Regular Expressions", "RE to NFA", "Pumping Lemma", "Closure Properties", "Myhill-Nerode Theorem"],
+          "hours": "6"
+        },
+        {
+          "title": "Context-Free Languages",
+          "description": "CFGs, PDAs, parse trees, and ambiguity.",
+          "topics": ["CFG", "PDA", "Parse Trees", "Ambiguity", "CNF & GNF"],
+          "hours": "6"
+        },
+        {
+          "title": "Turing Machines",
+          "description": "TM design, variants, Church-Turing thesis, and decidability.",
+          "topics": ["Standard TM", "Multi-tape TM", "Church-Turing Thesis", "Decidability", "Halting Problem"],
+          "hours": "6"
+        },
+        {
+          "title": "Complexity Theory",
+          "description": "P, NP, NP-Complete, NP-Hard, and reductions.",
+          "topics": ["P vs NP", "NP-Completeness", "Cook's Theorem", "Polynomial Reductions", "NP-Hard Problems"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Theory of Computation", "url": "https://www.youtube.com/watch?v=58N2N7zJGrQ", "moduleIndex": 0 },
+        { "title": "NFA to DFA Conversion", "url": "https://www.youtube.com/watch?v=--CSVsFIDng", "moduleIndex": 0 },
+        { "title": "Pumping Lemma", "url": "https://www.youtube.com/watch?v=dikEDuepOtI", "moduleIndex": 1 },
+        { "title": "P vs NP Explained", "url": "https://www.youtube.com/watch?v=YX40hbAHx3s", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Convert the NFA to DFA for the language accepting strings ending in '01'.", "answer": "States: {q0}, {q0,q1}, {q0,q2}. On 0: {q0}→{q0,q1}. On 1: {q0}→{q0}, {q0,q1}→{q0,q2}. Accept state: {q0,q2}. Apply subset construction for all reachable states.", "moduleIndex": 0 },
+        { "question": "Use Pumping Lemma to prove L = {a^n b^n} is not regular.", "answer": "Assume regular with pumping length p. Choose w = a^p b^p. For any split w = xyz with |xy| ≤ p, y = a^k (k≥1). Pumping: xy²z = a^(p+k) b^p ∉ L. Contradiction. Therefore not regular.", "moduleIndex": 1 },
+        { "question": "What is the significance of the Halting Problem?", "answer": "The Halting Problem asks: does a given TM halt on a given input? Turing proved it's undecidable (no algorithm can solve it for all cases) using diagonalization. Establishes fundamental limits of computation — not everything is computable.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BECE302L",
+      "name": "Signals and Systems",
+      "department": "ECE",
+      "semester": "4",
+      "credits": "4",
+      "description": "Analysis of continuous and discrete-time signals, LTI systems, Fourier and Laplace transforms.",
+      "modules": [
+        {
+          "title": "Signal Classification",
+          "description": "Types of signals, basic operations, and elementary signals.",
+          "topics": ["CT & DT Signals", "Even & Odd Signals", "Unit Step & Impulse", "Signal Operations", "Periodicity"],
+          "hours": "5"
+        },
+        {
+          "title": "LTI Systems",
+          "description": "Convolution, system properties, and impulse response.",
+          "topics": ["Convolution", "Causality", "Stability", "Impulse Response", "System Interconnections"],
+          "hours": "6"
+        },
+        {
+          "title": "Fourier Analysis",
+          "description": "Fourier Series, Fourier Transform, and their properties.",
+          "topics": ["Fourier Series", "CTFT", "DTFT", "DFT & FFT", "Frequency Response"],
+          "hours": "7"
+        },
+        {
+          "title": "Laplace Transform",
+          "description": "Laplace transform, ROC, inverse transform, and system analysis.",
+          "topics": ["Laplace Transform", "ROC", "Inverse Laplace", "Transfer Function", "Pole-Zero Plot"],
+          "hours": "6"
+        },
+        {
+          "title": "Z-Transform",
+          "description": "Z-transform, inverse Z-transform, and discrete-time system analysis.",
+          "topics": ["Z-Transform", "ROC", "Inverse Z", "System Function", "Stability Analysis"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Signals & Systems Full Course", "url": "https://www.youtube.com/watch?v=s8rsR_TStaA", "moduleIndex": 0 },
+        { "title": "Convolution Explained", "url": "https://www.youtube.com/watch?v=KuXjwB4LzSA", "moduleIndex": 1 },
+        { "title": "Fourier Transform Intuition", "url": "https://www.youtube.com/watch?v=spUNpyF58BY", "moduleIndex": 2 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain the properties of LTI systems.", "answer": "Linearity: superposition holds (scaling + additivity). Time-Invariance: shifting input shifts output by same amount. Output = input * impulse response (convolution). Completely characterized by h(t) or H(s).", "moduleIndex": 1 },
+        { "question": "State and prove the time-shifting property of Fourier Transform.", "answer": "If x(t) ↔ X(jω), then x(t-t₀) ↔ e^(-jωt₀) X(jω). Proof: FT of x(t-t₀) = ∫x(t-t₀)e^(-jωt)dt. Substitute τ=t-t₀: = e^(-jωt₀) ∫x(τ)e^(-jωτ)dτ = e^(-jωt₀) X(jω).", "moduleIndex": 2 }
+      ]
+    },
+    {
+      "code": "BMEE301L",
+      "name": "Thermodynamics",
+      "department": "MECH",
+      "semester": "3",
+      "credits": "4",
+      "description": "Engineering thermodynamics covering laws of thermodynamics, entropy, power cycles, and refrigeration.",
+      "modules": [
+        {
+          "title": "Basic Concepts",
+          "description": "Thermodynamic systems, properties, state, equilibrium, and processes.",
+          "topics": ["System Types", "Properties & State", "Equilibrium", "Processes", "Zeroth Law"],
+          "hours": "4"
+        },
+        {
+          "title": "First Law of Thermodynamics",
+          "description": "Energy conservation, internal energy, enthalpy, and steady-state flow.",
+          "topics": ["Energy Balance", "Internal Energy", "Enthalpy", "Specific Heats", "SFEE"],
+          "hours": "6"
+        },
+        {
+          "title": "Second Law & Entropy",
+          "description": "Kelvin-Planck and Clausius statements, Carnot cycle, and entropy.",
+          "topics": ["KP & Clausius Statements", "Carnot Cycle", "Entropy", "T-s Diagrams", "Irreversibility"],
+          "hours": "7"
+        },
+        {
+          "title": "Power Cycles",
+          "description": "Otto, Diesel, Brayton, and Rankine cycles analysis.",
+          "topics": ["Otto Cycle", "Diesel Cycle", "Dual Cycle", "Brayton Cycle", "Rankine Cycle"],
+          "hours": "7"
+        },
+        {
+          "title": "Refrigeration & Psychrometry",
+          "description": "Vapor compression refrigeration, heat pumps, and psychrometric processes.",
+          "topics": ["VCRS", "COP", "Heat Pumps", "Psychrometric Chart", "Air Conditioning"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Thermodynamics Full Course", "url": "https://www.youtube.com/watch?v=tNveMjoKRKE", "moduleIndex": 0 },
+        { "title": "Carnot Cycle Explained", "url": "https://www.youtube.com/watch?v=ckMt98kMa4E", "moduleIndex": 2 },
+        { "title": "Otto vs Diesel Cycle", "url": "https://www.youtube.com/watch?v=BQFEDwJCJAI", "moduleIndex": 3 }
+      ],
+      "importantQuestions": [
+        { "question": "State and explain the Second Law of Thermodynamics.", "answer": "Kelvin-Planck: Impossible to convert all heat from a reservoir to work in a cycle. Clausius: Heat cannot flow from cold to hot body without external work. Both are equivalent and establish the direction of natural processes and concept of entropy.", "moduleIndex": 2 },
+        { "question": "Compare Otto and Diesel cycles.", "answer": "Otto: constant-volume heat addition, spark ignition, compression ratio 6-10, efficiency = 1-(1/r^(γ-1)). Diesel: constant-pressure heat addition, compression ignition, ratio 14-22, higher efficiency but complex. Otto used in petrol engines, Diesel in diesel engines.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BCSE307L",
+      "name": "Artificial Intelligence",
+      "department": "CSE",
+      "semester": "6",
+      "credits": "4",
+      "description": "AI fundamentals including search algorithms, knowledge representation, machine learning basics, and neural networks.",
+      "modules": [
+        {
+          "title": "Introduction to AI",
+          "description": "AI history, intelligent agents, and environment types.",
+          "topics": ["AI History", "Intelligent Agents", "PEAS Description", "Environment Types", "Agent Architectures"],
+          "hours": "4"
+        },
+        {
+          "title": "Search Algorithms",
+          "description": "Uninformed and informed search strategies.",
+          "topics": ["BFS & DFS", "Uniform Cost Search", "A* Search", "Heuristics", "Hill Climbing"],
+          "hours": "7"
+        },
+        {
+          "title": "Knowledge Representation",
+          "description": "Propositional and first-order logic, inference methods.",
+          "topics": ["Propositional Logic", "First-Order Logic", "Unification", "Resolution", "Forward & Backward Chaining"],
+          "hours": "6"
+        },
+        {
+          "title": "Machine Learning Basics",
+          "description": "Supervised, unsupervised learning, decision trees, and evaluation.",
+          "topics": ["Supervised Learning", "Decision Trees", "K-NN", "Naive Bayes", "Clustering (K-Means)"],
+          "hours": "7"
+        },
+        {
+          "title": "Neural Networks",
+          "description": "Perceptrons, multilayer networks, backpropagation, and deep learning intro.",
+          "topics": ["Perceptron", "MLP", "Backpropagation", "Activation Functions", "CNN & RNN Basics"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "AI Full Course", "url": "https://www.youtube.com/watch?v=JMUxmLyrhSk", "moduleIndex": 0 },
+        { "title": "A* Search Algorithm", "url": "https://www.youtube.com/watch?v=ySN5Wnu88nE", "moduleIndex": 1 },
+        { "title": "Neural Networks from Scratch", "url": "https://www.youtube.com/watch?v=aircAruvnKk", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain A* search algorithm with admissibility condition.", "answer": "A* uses f(n) = g(n) + h(n), where g = cost so far, h = heuristic estimate to goal. Admissible: h never overestimates actual cost. A* is optimal and complete when h is admissible. Time/space: O(b^d).", "moduleIndex": 1 },
+        { "question": "Compare supervised and unsupervised learning.", "answer": "Supervised: labeled data, learns input→output mapping (classification, regression). Examples: Decision Trees, SVM. Unsupervised: no labels, finds patterns/structure (clustering, dimensionality reduction). Examples: K-Means, PCA.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BMAT301L",
+      "name": "Discrete Mathematics",
+      "department": "CSE",
+      "semester": "3",
+      "credits": "4",
+      "description": "Mathematical foundations for CS: logic, sets, relations, functions, graph theory, and combinatorics.",
+      "modules": [
+        {
+          "title": "Logic & Proofs",
+          "description": "Propositional logic, predicate logic, proof techniques.",
+          "topics": ["Propositional Logic", "Predicate Logic", "Proof by Induction", "Contradiction", "Direct Proofs"],
+          "hours": "6"
+        },
+        {
+          "title": "Sets & Relations",
+          "description": "Set operations, relations, equivalence relations, partial orders.",
+          "topics": ["Set Operations", "Relations", "Equivalence Relations", "Partial Orders", "Hasse Diagrams"],
+          "hours": "6"
+        },
+        {
+          "title": "Functions & Sequences",
+          "description": "Types of functions, recurrence relations, and generating functions.",
+          "topics": ["Injective/Surjective/Bijective", "Recurrence Relations", "Generating Functions", "Growth of Functions", "Big-O Notation"],
+          "hours": "5"
+        },
+        {
+          "title": "Combinatorics",
+          "description": "Counting principles, permutations, combinations, and pigeonhole principle.",
+          "topics": ["Counting Principles", "Permutations", "Combinations", "Pigeonhole Principle", "Inclusion-Exclusion"],
+          "hours": "6"
+        },
+        {
+          "title": "Graph Theory",
+          "description": "Graphs, trees, Euler/Hamilton paths, coloring, and planar graphs.",
+          "topics": ["Graph Types", "Euler & Hamilton Paths", "Trees & Spanning Trees", "Graph Coloring", "Planar Graphs"],
+          "hours": "7"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Discrete Math Full Course", "url": "https://www.youtube.com/watch?v=rdXw7Ps9vxc", "moduleIndex": 0 },
+        { "title": "Graph Theory Tutorial", "url": "https://www.youtube.com/watch?v=LFKZLXVO-Dg", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Prove by induction: 1+2+...+n = n(n+1)/2.", "answer": "Base: n=1, LHS=1, RHS=1(2)/2=1. ✓ Inductive step: Assume true for k. Then 1+...+k+(k+1) = k(k+1)/2 + (k+1) = (k+1)(k+2)/2. True for k+1. By induction, true for all n≥1.", "moduleIndex": 0 },
+        { "question": "State and prove the Pigeonhole Principle.", "answer": "If n items are placed in m containers and n > m, then at least one container has more than one item. Proof by contradiction: if each container has ≤1 item, total items ≤ m < n. Contradiction.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BCSE308L",
+      "name": "Cloud Computing",
+      "department": "CSE",
+      "semester": "6",
+      "credits": "3",
+      "description": "Cloud computing concepts, virtualization, service models, deployment models, and cloud platforms.",
+      "modules": [
+        {
+          "title": "Introduction to Cloud Computing",
+          "description": "Cloud concepts, characteristics, service models, and deployment models.",
+          "topics": ["Cloud Definition", "NIST Characteristics", "IaaS, PaaS, SaaS", "Public/Private/Hybrid", "Cloud Economics"],
+          "hours": "5"
+        },
+        {
+          "title": "Virtualization",
+          "description": "Types of virtualization, hypervisors, and containers.",
+          "topics": ["Hardware Virtualization", "Type 1 & 2 Hypervisors", "Docker & Containers", "VM vs Containers", "Kubernetes Basics"],
+          "hours": "6"
+        },
+        {
+          "title": "Cloud Architecture",
+          "description": "Cloud reference architecture, SLA, and cloud storage.",
+          "topics": ["Cloud Reference Architecture", "SLA", "Cloud Storage", "Content Delivery Networks", "Load Balancing"],
+          "hours": "6"
+        },
+        {
+          "title": "Cloud Platforms",
+          "description": "AWS, GCP, Azure services overview and hands-on.",
+          "topics": ["AWS (EC2, S3, Lambda)", "GCP (Compute, GCS)", "Azure Basics", "Serverless Computing", "Cloud Functions"],
+          "hours": "7"
+        },
+        {
+          "title": "Cloud Security",
+          "description": "Cloud security concerns, IAM, encryption, and compliance.",
+          "topics": ["IAM", "Encryption at Rest & Transit", "Cloud Security Risks", "Compliance (GDPR, HIPAA)", "Zero Trust Architecture"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Cloud Computing Full Course", "url": "https://www.youtube.com/watch?v=EN4fEbcFZ_E", "moduleIndex": 0 },
+        { "title": "Docker in 1 Hour", "url": "https://www.youtube.com/watch?v=fqMOX6JJhGo", "moduleIndex": 1 },
+        { "title": "AWS Tutorial for Beginners", "url": "https://www.youtube.com/watch?v=k1RI5locZE4", "moduleIndex": 3 }
+      ],
+      "importantQuestions": [
+        { "question": "Compare IaaS, PaaS, and SaaS with examples.", "answer": "IaaS: Infrastructure (VMs, storage) — AWS EC2, GCP Compute. PaaS: Platform (runtime, DB) — Heroku, Google App Engine. SaaS: Complete apps — Gmail, Salesforce. Abstraction increases from IaaS→SaaS; user control decreases.", "moduleIndex": 0 },
+        { "question": "Compare VMs and Containers.", "answer": "VMs: full OS per VM, hypervisor-based, heavier (GBs), slower boot. Containers: share host OS kernel, lighter (MBs), faster boot, Docker/K8s. Containers for microservices; VMs for full isolation.", "moduleIndex": 1 }
+      ]
+    },
+    {
+      "code": "BCSE309L",
+      "name": "Machine Learning",
+      "department": "CSE",
+      "semester": "6",
+      "credits": "4",
+      "description": "Machine learning algorithms, model evaluation, ensemble methods, and introduction to deep learning.",
+      "modules": [
+        {
+          "title": "ML Fundamentals",
+          "description": "ML types, bias-variance tradeoff, and evaluation metrics.",
+          "topics": ["Supervised vs Unsupervised", "Bias-Variance Tradeoff", "Cross-Validation", "Confusion Matrix", "ROC & AUC"],
+          "hours": "5"
+        },
+        {
+          "title": "Regression",
+          "description": "Linear regression, polynomial regression, regularization.",
+          "topics": ["Linear Regression", "Polynomial Regression", "Ridge & Lasso", "Gradient Descent", "Normal Equation"],
+          "hours": "6"
+        },
+        {
+          "title": "Classification",
+          "description": "Logistic regression, SVM, decision trees, and random forests.",
+          "topics": ["Logistic Regression", "SVM", "Decision Trees", "Random Forest", "KNN"],
+          "hours": "7"
+        },
+        {
+          "title": "Unsupervised Learning",
+          "description": "Clustering, dimensionality reduction, and anomaly detection.",
+          "topics": ["K-Means", "Hierarchical Clustering", "PCA", "t-SNE", "Anomaly Detection"],
+          "hours": "6"
+        },
+        {
+          "title": "Deep Learning Intro",
+          "description": "Neural networks, CNNs, RNNs, and practical frameworks.",
+          "topics": ["Neural Networks", "CNN Architecture", "RNN & LSTM", "Transfer Learning", "TensorFlow/PyTorch"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Machine Learning Full Course", "url": "https://www.youtube.com/watch?v=Gv9_4yMHFhI", "moduleIndex": 0 },
+        { "title": "Gradient Descent Explained", "url": "https://www.youtube.com/watch?v=sDv4f4s2SB8", "moduleIndex": 1 },
+        { "title": "SVM Explained", "url": "https://www.youtube.com/watch?v=efR1C6CvhmE", "moduleIndex": 2 },
+        { "title": "CNN Explained", "url": "https://www.youtube.com/watch?v=zfiSAzpy9NM", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain the bias-variance tradeoff.", "answer": "Bias: error from overly simple models (underfitting). Variance: error from overly complex models (overfitting). Total Error = Bias² + Variance + Noise. Goal: find sweet spot. Regularization reduces variance at slight increase in bias.", "moduleIndex": 0 },
+        { "question": "How does SVM find the optimal hyperplane?", "answer": "SVM maximizes the margin between classes. Support vectors are closest points to the decision boundary. Optimization: minimize ||w||² subject to yᵢ(w·xᵢ+b) ≥ 1. Kernel trick maps to higher dimensions for non-linear separation.", "moduleIndex": 2 }
+      ]
+    },
+    {
+      "code": "BMEE302L",
+      "name": "Fluid Mechanics",
+      "department": "MECH",
+      "semester": "4",
+      "credits": "4",
+      "description": "Fluid statics, kinematics, dynamics, and applications including pipe flow and boundary layer theory.",
+      "modules": [
+        {
+          "title": "Fluid Properties & Statics",
+          "description": "Fluid properties, pressure measurement, hydrostatic forces, and buoyancy.",
+          "topics": ["Density & Viscosity", "Pascal's Law", "Manometers", "Hydrostatic Force", "Buoyancy & Stability"],
+          "hours": "6"
+        },
+        {
+          "title": "Fluid Kinematics",
+          "description": "Flow visualization, velocity fields, streamlines, and flow classification.",
+          "topics": ["Streamlines", "Velocity Field", "Acceleration", "Vorticity", "Stream & Potential Functions"],
+          "hours": "6"
+        },
+        {
+          "title": "Fluid Dynamics",
+          "description": "Bernoulli's equation, momentum equation, and energy equation.",
+          "topics": ["Continuity Equation", "Bernoulli's Equation", "Momentum Equation", "Euler's Equation", "Navier-Stokes"],
+          "hours": "7"
+        },
+        {
+          "title": "Viscous Flow",
+          "description": "Laminar and turbulent flow, pipe flow analysis, head losses.",
+          "topics": ["Reynolds Number", "Hagen-Poiseuille Flow", "Moody Chart", "Major & Minor Losses", "Pipe Networks"],
+          "hours": "6"
+        },
+        {
+          "title": "Boundary Layer Theory",
+          "description": "Boundary layer concept, drag and lift, and flow separation.",
+          "topics": ["Boundary Layer", "Displacement Thickness", "Drag & Lift", "Flow Separation", "Turbulent BL"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Fluid Mechanics Full Course", "url": "https://www.youtube.com/watch?v=PZtMGr0pNqU", "moduleIndex": 0 },
+        { "title": "Bernoulli's Principle", "url": "https://www.youtube.com/watch?v=UJ3-Zm1wFmM", "moduleIndex": 2 }
+      ],
+      "importantQuestions": [
+        { "question": "Derive Bernoulli's equation from Euler's equation.", "answer": "Along a streamline: dp/ρ + VdV + gdz = 0 (Euler). Integrate for incompressible flow: P/ρ + V²/2 + gz = constant. Assumptions: steady, incompressible, inviscid, along streamline.", "moduleIndex": 2 },
+        { "question": "Explain Reynolds number and its significance.", "answer": "Re = ρVD/μ = Inertial forces/Viscous forces. Re < 2300: laminar flow (orderly). Re > 4000: turbulent (chaotic). 2300-4000: transitional. Critical for predicting flow behavior and calculating friction losses.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BCSE310L",
+      "name": "Compiler Design",
+      "department": "CSE",
+      "semester": "6",
+      "credits": "3",
+      "description": "Compiler construction phases: lexical analysis, parsing, semantic analysis, code generation, and optimization.",
+      "modules": [
+        {
+          "title": "Lexical Analysis",
+          "description": "Tokens, regular expressions, finite automata, and Lex tool.",
+          "topics": ["Tokens & Lexemes", "Regular Expressions", "DFA-based Scanning", "Lex Tool", "Error Recovery"],
+          "hours": "5"
+        },
+        {
+          "title": "Syntax Analysis",
+          "description": "CFGs, top-down and bottom-up parsing.",
+          "topics": ["Top-Down Parsing", "LL(1) Parsing", "Bottom-Up Parsing", "SLR, CLR, LALR", "Yacc Tool"],
+          "hours": "8"
+        },
+        {
+          "title": "Semantic Analysis",
+          "description": "Attribute grammars, type checking, and symbol tables.",
+          "topics": ["Attribute Grammars", "SDT", "Type Checking", "Symbol Tables", "Scope Rules"],
+          "hours": "6"
+        },
+        {
+          "title": "Intermediate Code Generation",
+          "description": "Three-address code, syntax trees, and DAGs.",
+          "topics": ["Three-Address Code", "Quadruples & Triples", "Syntax Trees", "DAG", "Boolean Expressions"],
+          "hours": "6"
+        },
+        {
+          "title": "Code Optimization & Generation",
+          "description": "Local and global optimizations, register allocation, and target code generation.",
+          "topics": ["Local Optimization", "Loop Optimization", "Register Allocation", "Peephole Optimization", "Code Generation"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Compiler Design Full Course", "url": "https://www.youtube.com/watch?v=Qkwj65l_96I", "moduleIndex": 0 },
+        { "title": "LL(1) Parsing", "url": "https://www.youtube.com/watch?v=_uSlP-F4pXE", "moduleIndex": 1 },
+        { "title": "LR Parsing", "url": "https://www.youtube.com/watch?v=fC1RxQXPyjM", "moduleIndex": 1 }
+      ],
+      "importantQuestions": [
+        { "question": "Construct LL(1) parsing table for a given grammar.", "answer": "Steps: 1) Eliminate left recursion. 2) Left factor. 3) Compute FIRST and FOLLOW sets. 4) For each production A→α, add to M[A, a] for each a in FIRST(α). If ε in FIRST(α), add for each b in FOLLOW(A). No conflicts = LL(1).", "moduleIndex": 1 },
+        { "question": "Generate three-address code for: a = b * -c + b * -c.", "answer": "t1 = minus c; t2 = b * t1; t3 = minus c; t4 = b * t3; t5 = t2 + t4; a = t5. With DAG optimization: t1 = minus c; t2 = b * t1; t3 = t2 + t2; a = t3 (CSE eliminated).", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BECE303L",
+      "name": "Microprocessors and Microcontrollers",
+      "department": "ECE",
+      "semester": "5",
+      "credits": "4",
+      "description": "Architecture and programming of microprocessors (8086) and microcontrollers (8051, ARM), interfacing techniques.",
+      "modules": [
+        {
+          "title": "8086 Architecture",
+          "description": "8086 internal architecture, registers, addressing modes, and instruction set.",
+          "topics": ["BIU & EU", "Registers", "Addressing Modes", "Instruction Set", "Interrupts"],
+          "hours": "7"
+        },
+        {
+          "title": "Assembly Programming",
+          "description": "8086 assembly programming, procedures, and macros.",
+          "topics": ["Data Transfer", "Arithmetic Instructions", "String Operations", "Procedures", "Macros"],
+          "hours": "6"
+        },
+        {
+          "title": "Interfacing",
+          "description": "Memory interfacing, I/O interfacing, and peripheral chips.",
+          "topics": ["Memory Interfacing", "8255 PPI", "8254 Timer", "8259 PIC", "8237 DMA"],
+          "hours": "6"
+        },
+        {
+          "title": "8051 Microcontroller",
+          "description": "8051 architecture, ports, timers, serial communication, and interrupts.",
+          "topics": ["8051 Architecture", "Ports & I/O", "Timers/Counters", "Serial Communication", "Interrupt System"],
+          "hours": "6"
+        },
+        {
+          "title": "ARM Architecture",
+          "description": "ARM processor basics, instruction set, and embedded applications.",
+          "topics": ["ARM Architecture", "Thumb Mode", "Pipeline", "ARM Instructions", "Embedded C"],
+          "hours": "5"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "8086 Microprocessor", "url": "https://www.youtube.com/watch?v=KhGWbt1dY6w", "moduleIndex": 0 },
+        { "title": "8051 Microcontroller", "url": "https://www.youtube.com/watch?v=V_1QVMKTRzI", "moduleIndex": 3 },
+        { "title": "ARM Architecture", "url": "https://www.youtube.com/watch?v=7LqPJGnBPMM", "moduleIndex": 4 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain the architecture of 8086 microprocessor.", "answer": "Two units: BIU (Bus Interface Unit — fetches instructions, manages bus) and EU (Execution Unit — decodes and executes). 20-bit address bus (1MB), 16-bit data bus. Segmented memory: CS, DS, SS, ES. Instruction queue for pipelining.", "moduleIndex": 0 },
+        { "question": "Compare 8086 and 8051.", "answer": "8086: microprocessor, 16-bit, external memory/peripherals needed, general purpose. 8051: microcontroller, 8-bit, built-in RAM/ROM/timers/serial/ports, embedded applications. 8051 is self-contained; 8086 needs external chips.", "moduleIndex": 3 }
+      ]
+    },
+    {
+      "code": "BCSE311L",
+      "name": "Cryptography and Network Security",
+      "department": "CSE",
+      "semester": "7",
+      "credits": "3",
+      "description": "Cryptographic algorithms, protocols, and network security fundamentals including symmetric and asymmetric encryption.",
+      "modules": [
+        {
+          "title": "Introduction & Classical Ciphers",
+          "description": "Security goals, classical encryption techniques, and substitution ciphers.",
+          "topics": ["CIA Triad", "Caesar Cipher", "Playfair Cipher", "Hill Cipher", "Transposition Ciphers"],
+          "hours": "5"
+        },
+        {
+          "title": "Symmetric Key Cryptography",
+          "description": "DES, AES, block cipher modes, and stream ciphers.",
+          "topics": ["DES Algorithm", "AES Algorithm", "Block Cipher Modes", "Stream Ciphers (RC4)", "Key Management"],
+          "hours": "7"
+        },
+        {
+          "title": "Asymmetric Key Cryptography",
+          "description": "RSA, Diffie-Hellman, ECC, and digital signatures.",
+          "topics": ["RSA Algorithm", "Diffie-Hellman", "ECC", "Digital Signatures", "Key Exchange"],
+          "hours": "7"
+        },
+        {
+          "title": "Hash Functions & MAC",
+          "description": "MD5, SHA, HMAC, and message authentication.",
+          "topics": ["MD5", "SHA Family", "HMAC", "Birthday Attack", "Digital Certificates"],
+          "hours": "5"
+        },
+        {
+          "title": "Network Security",
+          "description": "SSL/TLS, IPSec, firewalls, and intrusion detection.",
+          "topics": ["SSL/TLS", "IPSec", "Firewalls", "IDS/IPS", "Email Security (PGP, S/MIME)"],
+          "hours": "6"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Cryptography Full Course", "url": "https://www.youtube.com/watch?v=JoeiLuFNBc4", "moduleIndex": 0 },
+        { "title": "RSA Algorithm Explained", "url": "https://www.youtube.com/watch?v=wXB-V_Keiu8", "moduleIndex": 2 },
+        { "title": "AES Explained", "url": "https://www.youtube.com/watch?v=O4xNJsjtN6E", "moduleIndex": 1 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain RSA algorithm with an example.", "answer": "Key gen: Choose p=3, q=11. n=33, φ=20. Choose e=7 (gcd(7,20)=1). d=3 (7×3 mod 20=1). Public: (33,7), Private: (33,3). Encrypt M=2: C=2⁷ mod 33=29. Decrypt: M=29³ mod 33=2. Security based on factoring difficulty.", "moduleIndex": 2 },
+        { "question": "Compare symmetric and asymmetric encryption.", "answer": "Symmetric: same key for encrypt/decrypt, fast, key distribution problem (DES, AES). Asymmetric: public/private key pair, slower, solves key distribution (RSA, ECC). Hybrid approach: use asymmetric for key exchange, symmetric for data.", "moduleIndex": 1 }
+      ]
+    },
+    {
+      "code": "BCSE312L",
+      "name": "Web Development",
+      "department": "CSE",
+      "semester": "5",
+      "credits": "3",
+      "description": "Full-stack web development covering HTML, CSS, JavaScript, React, Node.js, databases, and deployment.",
+      "modules": [
+        {
+          "title": "Frontend Basics",
+          "description": "HTML5, CSS3, responsive design, and JavaScript fundamentals.",
+          "topics": ["HTML5 Semantics", "CSS Flexbox & Grid", "Responsive Design", "JavaScript ES6+", "DOM Manipulation"],
+          "hours": "7"
+        },
+        {
+          "title": "React.js",
+          "description": "Component-based development, hooks, routing, and state management.",
+          "topics": ["Components & Props", "useState & useEffect", "React Router", "Context API", "Custom Hooks"],
+          "hours": "8"
+        },
+        {
+          "title": "Backend with Node.js",
+          "description": "Express.js, REST APIs, middleware, and authentication.",
+          "topics": ["Express.js", "REST API Design", "Middleware", "JWT Authentication", "Error Handling"],
+          "hours": "7"
+        },
+        {
+          "title": "Databases",
+          "description": "MongoDB (NoSQL) and SQL databases, ORMs, and CRUD operations.",
+          "topics": ["MongoDB & Mongoose", "SQL Basics", "CRUD Operations", "Indexing", "Aggregation"],
+          "hours": "5"
+        },
+        {
+          "title": "Deployment & DevOps",
+          "description": "Git, CI/CD, Docker basics, and cloud deployment.",
+          "topics": ["Git & GitHub", "CI/CD Pipelines", "Docker Basics", "Cloud Hosting", "Environment Variables"],
+          "hours": "3"
+        }
+      ],
+      "youtubeLinks": [
+        { "title": "Full Stack Web Dev", "url": "https://www.youtube.com/watch?v=nu_pCVPKzTk", "moduleIndex": 0 },
+        { "title": "React Full Course", "url": "https://www.youtube.com/watch?v=bMknfKXIFA8", "moduleIndex": 1 },
+        { "title": "Node.js & Express", "url": "https://www.youtube.com/watch?v=Oe421EPjeBE", "moduleIndex": 2 }
+      ],
+      "importantQuestions": [
+        { "question": "Explain React component lifecycle and hooks.", "answer": "Class lifecycle: mounting (constructor, render, componentDidMount), updating (shouldComponentUpdate, render, componentDidUpdate), unmounting (componentWillUnmount). Hooks equivalent: useState for state, useEffect for lifecycle, useContext for context, useMemo for optimization.", "moduleIndex": 1 },
+        { "question": "Design a REST API for a blog application.", "answer": "GET /api/posts — list all. GET /api/posts/:id — get one. POST /api/posts — create (auth required). PUT /api/posts/:id — update. DELETE /api/posts/:id — delete. Use proper HTTP status codes (200, 201, 404, 500).", "moduleIndex": 2 }
+      ]
+    }
+  ]
+}

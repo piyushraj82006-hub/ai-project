@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScrollIO — Working Principle & Selenium Testing Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-elevated: #1a1a28;
+      --accent: #6C63FF;
+      --accent-light: #8B83FF;
+      --accent-glow: rgba(108, 99, 255, 0.25);
+      --pink: #E91E63;
+      --green: #4CAF50;
+      --orange: #FF9800;
+      --cyan: #4ECDC4;
+      --red: #F44336;
+      --text-primary: #f0f0f5;
+      --text-secondary: #a0a0b5;
+      --text-muted: #606075;
+      --border: rgba(255, 255, 255, 0.06);
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated background ─── */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(108, 99, 255, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(233, 30, 99, 0.08), transparent);
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 100px 24px 60px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 18px; border-radius: 100px;
+      background: rgba(108, 99, 255, 0.1);
+      border: 1px solid rgba(108, 99, 255, 0.25);
+      font-size: 12px; font-weight: 600; color: var(--accent-light);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 24px;
+    }
+    .hero-badge::before {
+      content: ''; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s ease infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px; color: var(--text-secondary);
+      max-width: 600px; margin: 0 auto 32px;
+    }
+    .hero-meta {
+      display: flex; justify-content: center; gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .hero-meta-item .num {
+      font-size: 28px; font-weight: 700; color: var(--accent-light);
+    }
+    .hero-meta-item .label {
+      font-size: 12px; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ─── Architecture section ─── */
+    .architecture {
+      position: relative; z-index: 1;
+      max-width: 1000px; margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+    .arch-title {
+      text-align: center;
+      font-size: 28px; font-weight: 700; margin-bottom: 12px;
+    }
+    .arch-subtitle {
+      text-align: center;
+      font-size: 15px; color: var(--text-secondary); margin-bottom: 40px;
+    }
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .arch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .arch-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(108, 99, 255, 0.3);
+    }
+    .arch-card-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 14px;
+    }
+    .arch-card h4 {
+      font-size: 16px; font-weight: 600; margin-bottom: 6px;
+    }
+    .arch-card p {
+      font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* ─── Tech stack ─── */
+    .tech-stack {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 40px 24px 60px;
+    }
+    .tech-pills {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+      max-width: 800px; margin: 24px auto 0;
+    }
+    .tech-pill {
+      padding: 8px 18px; border-radius: 100px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .tech-pill:hover { border-color: var(--accent); color: var(--accent-light); }
+    .tech-pill .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+
+    /* ─── Steps (walkthrough) ─── */
+    .steps {
+      position: relative; z-index: 1;
+      max-width: 1000px; margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .steps-header {
+      text-align: center; margin-bottom: 48px;
+    }
+    .steps-header h2 {
+      font-size: 32px; font-weight: 700; margin-bottom: 8px;
+    }
+    .steps-header p {
+      font-size: 15px; color: var(--text-secondary);
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+      margin-bottom: 80px;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .step.visible { opacity: 1; transform: translateY(0); }
+    .step:nth-child(even) .step-text { order: 2; }
+    .step:nth-child(even) .step-media { order: 1; }
+
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 10px;
+      font-size: 14px; font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .step-text h3 {
+      font-size: 22px; font-weight: 700; margin-bottom: 8px;
+    }
+    .step-text .subtitle {
+      font-size: 14px; color: var(--accent-light);
+      font-weight: 500; margin-bottom: 12px;
+    }
+    .step-text p {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .step-features {
+      list-style: none; display: flex; flex-direction: column; gap: 8px;
+    }
+    .step-features li {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .step-features li::before {
+      content: '✓'; color: var(--green); font-weight: 700;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    .step-media {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .step-media img {
+      width: 100%;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .step-media:hover img { transform: scale(1.02); }
+    .step-media .img-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 10px 16px;
+      background: linear-gradient(transparent, rgba(10, 10, 15, 0.9));
+      font-size: 11px; color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── Selenium report badge ─── */
+    .selenium-badge {
+      position: relative; z-index: 1;
+      max-width: 700px; margin: 0 auto;
+      padding: 0 24px 80px;
+      text-align: center;
+    }
+    .selenium-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+    .selenium-card h3 {
+      font-size: 20px; font-weight: 700; margin-bottom: 8px;
+    }
+    .selenium-card p {
+      font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;
+    }
+    .result-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 24px;
+    }
+    .result-item {
+      background: var(--bg-elevated);
+      border-radius: 12px; padding: 16px;
+    }
+    .result-item .val {
+      font-size: 24px; font-weight: 700; color: var(--green);
+    }
+    .result-item .lbl {
+      font-size: 11px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .run-cmd {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px; color: var(--accent-light);
+      user-select: all;
+    }
+
+    /* ─── Hero CTA buttons ─── */
+    .hero-actions {
+      display: flex; justify-content: center; gap: 16px;
+      margin-top: 32px; flex-wrap: wrap;
+    }
+    .btn-selenium {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 12px;
+      background: linear-gradient(135deg, #43B02A, #2E7D32);
+      color: #fff; font-size: 15px; font-weight: 600;
+      text-decoration: none; border: none;
+      box-shadow: 0 0 20px rgba(67, 176, 42, 0.3), 0 4px 16px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .btn-selenium:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(67, 176, 42, 0.5), 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .btn-selenium svg { flex-shrink: 0; }
+    .btn-app {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary); font-size: 15px; font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.3s, border-color 0.3s;
+      cursor: pointer;
+    }
+    .btn-app:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+
+    /* ─── Screenshot Cinema ─── */
+    .cinema {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .cinema-header {
+      text-align: center; margin-bottom: 32px;
+    }
+    .cinema-header h2 {
+      font-size: 28px; font-weight: 700; margin-bottom: 8px;
+    }
+    .cinema-header p {
+      font-size: 15px; color: var(--text-secondary);
+    }
+    .cinema-player {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      aspect-ratio: 16 / 9;
+    }
+    .cinema-player img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #000;
+      transition: opacity 0.5s ease;
+    }
+    .cinema-controls {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    }
+    .cinema-play-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: transform 0.2s, background 0.2s;
+      color: #fff;
+    }
+    .cinema-play-btn:hover { transform: scale(1.1); background: var(--accent-light); }
+    .cinema-progress {
+      flex: 1; height: 4px; border-radius: 4px;
+      background: rgba(255,255,255,0.15);
+      position: relative; cursor: pointer;
+    }
+    .cinema-progress-fill {
+      height: 100%; border-radius: 4px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    .cinema-label {
+      font-size: 12px; color: rgba(255,255,255,0.7);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+    .cinema-step-title {
+      position: absolute; top: 16px; left: 20px;
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      font-size: 13px; font-weight: 600; color: #fff;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cinema-step-title .dot-live {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--red);
+      animation: pulse-dot 1.5s ease infinite;
+    }
+
+    /* ─── Selenium CTA Banner ─── */
+    .selenium-cta {
+      position: relative; z-index: 1;
+      max-width: 800px; margin: 0 auto;
+      padding: 0 24px 40px;
+    }
+    .selenium-cta-card {
+      background: linear-gradient(135deg, rgba(67, 176, 42, 0.08), rgba(46, 125, 50, 0.08));
+      border: 1px solid rgba(67, 176, 42, 0.2);
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .selenium-cta-card::before {
+      content: ''; position: absolute;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(67, 176, 42, 0.15), transparent);
+      top: -100px; right: -100px;
+      pointer-events: none;
+    }
+    .selenium-cta-card h3 {
+      font-size: 24px; font-weight: 700; margin-bottom: 8px;
+    }
+    .selenium-cta-card p {
+      font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;
+      max-width: 500px; margin-left: auto; margin-right: auto;
+    }
+    .selenium-cta-features {
+      display: flex; justify-content: center; gap: 24px;
+      flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .selenium-cta-features .feat {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .selenium-cta-features .feat::before {
+      content: '✓'; color: #43B02A; font-weight: 700;
+    }
+    .btn-selenium-lg {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 16px 36px; border-radius: 14px;
+      background: linear-gradient(135deg, #43B02A, #2E7D32);
+      color: #fff; font-size: 17px; font-weight: 700;
+      text-decoration: none; border: none;
+      box-shadow: 0 0 25px rgba(67, 176, 42, 0.3), 0 6px 20px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative; z-index: 1;
+    }
+    .btn-selenium-lg:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 0 40px rgba(67, 176, 42, 0.5), 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--text-muted);
+    }
+    footer a { color: var(--accent-light); text-decoration: none; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .step { grid-template-columns: 1fr; }
+      .step:nth-child(even) .step-text { order: 1; }
+      .step:nth-child(even) .step-media { order: 2; }
+      .result-grid { grid-template-columns: 1fr; }
+      .hero-meta { gap: 20px; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .cinema-controls { padding: 10px 14px; }
+      .selenium-cta-features { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- ═══════ HERO ═══════ -->
+  <section class="hero">
+    <div class="hero-badge">Selenium Automated Report</div>
+    <h1>
+      <span class="gradient-text">ScrollIO</span><br />
+      Working Principle
+    </h1>
+    <p>
+      A comprehensive automated walkthrough demonstrating every feature of the
+      ScrollIO AI-powered study platform, tested via Selenium WebDriver.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="num">13</span>
+        <span class="label">Test Steps</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="num">31</span>
+        <span class="label">Screenshots</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="num">0</span>
+        <span class="label">Failures</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="num">100%</span>
+        <span class="label">Pass Rate</span>
+      </div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="hero-actions">
+      <a href="https://www.selenium.dev/" target="_blank" class="btn-selenium">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Visit Selenium Website
+      </a>
+      <a href="/" class="btn-app">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Open ScrollIO App
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════ ARCHITECTURE ═══════ -->
+  <section class="architecture">
+    <h2 class="arch-title">System Architecture</h2>
+    <p class="arch-subtitle">How ScrollIO processes documents and delivers AI-powered study materials</p>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="arch-card-icon" style="background: rgba(108, 99, 255, 0.1); color: var(--accent);">🔐</div>
+        <h4>Authentication Layer</h4>
+        <p>Local auth system with email/password sign-in, sign-up, and session persistence via localStorage. Google OAuth available in production.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-card-icon" style="background: rgba(255, 152, 0, 0.1); color: var(--orange);">📄</div>
+        <h4>PDF Processing Engine</h4>
+        <p>PDF.js extracts text from standard PDFs. For scanned documents, the file is converted to base64 and sent to Gemini Vision API for OCR-like extraction.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-card-icon" style="background: rgba(76, 175, 80, 0.1); color: var(--green);">🤖</div>
+        <h4>Dual AI Engine</h4>
+        <p>Gemini API generates structured summaries, mind map data, and reels. Groq's Llama 3.1 powers the high-speed chatbot with vector-embedded context.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-card-icon" style="background: rgba(233, 30, 99, 0.1); color: var(--pink);">🧠</div>
+        <h4>Visualization Layer</h4>
+        <p>D3.js renders interactive radial mind maps. React Markdown with KaTeX renders LaTeX equations. Summary views use structured JSON rendering.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-card-icon" style="background: rgba(78, 205, 196, 0.1); color: var(--cyan);">🎬</div>
+        <h4>Reels Generator</h4>
+        <p>AI distills documents into Instagram-style educational cards with titles, content, and key points. Swipeable carousel with download support.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-card-icon" style="background: rgba(244, 67, 54, 0.1); color: var(--red);">💾</div>
+        <h4>Storage & History</h4>
+        <p>LocalStorage persists user data, summaries, and reels. Dashboard displays history with one-click reload and delete functionality.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ TECH STACK ═══════ -->
+  <section class="tech-stack">
+    <h2 class="arch-title">Technology Stack</h2>
+    <div class="tech-pills">
+      <div class="tech-pill"><span class="dot" style="background: #61DAFB;"></span> React 19</div>
+      <div class="tech-pill"><span class="dot" style="background: #646CFF;"></span> Vite 8</div>
+      <div class="tech-pill"><span class="dot" style="background: #FFCA28;"></span> Firebase</div>
+      <div class="tech-pill"><span class="dot" style="background: #4285F4;"></span> Gemini API</div>
+      <div class="tech-pill"><span class="dot" style="background: #FF6B6B;"></span> Groq / Llama 3.1</div>
+      <div class="tech-pill"><span class="dot" style="background: #F7931E;"></span> D3.js</div>
+      <div class="tech-pill"><span class="dot" style="background: #E34F26;"></span> PDF.js</div>
+      <div class="tech-pill"><span class="dot" style="background: #43B02A;"></span> Selenium</div>
+      <div class="tech-pill"><span class="dot" style="background: #3776AB;"></span> Python 3.12</div>
+      <div class="tech-pill"><span class="dot" style="background: #F06292;"></span> React Router 7</div>
+      <div class="tech-pill"><span class="dot" style="background: #26A69A;"></span> KaTeX</div>
+      <div class="tech-pill"><span class="dot" style="background: #AB47BC;"></span> Lucide Icons</div>
+    </div>
+  </section>
+
+  <!-- ═══════ SCREENSHOT CINEMA ═══════ -->
+  <section class="cinema">
+    <div class="cinema-header">
+      <h2>Test <span class="gradient-text">Recording</span></h2>
+      <p>Watch the Selenium automated test play through all 31 captured screenshots</p>
+    </div>
+    <div class="cinema-player" id="cinemaPlayer">
+      <img id="cinemaImg" src="/selenium_screenshots/01_login_page.png" alt="Selenium test recording" />
+      <div class="cinema-step-title">
+        <span class="dot-live"></span>
+        <span id="cinemaTitle">Step 1: Login Page</span>
+      </div>
+      <div class="cinema-controls">
+        <button class="cinema-play-btn" id="cinemaPlayBtn" title="Play/Pause">
+          <svg id="playIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="pauseIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <div class="cinema-progress" id="cinemaProgress">
+          <div class="cinema-progress-fill" id="cinemaProgressFill" style="width: 0%;"></div>
+        </div>
+        <span class="cinema-label" id="cinemaCounter">1 / 31</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ WALKTHROUGH STEPS ═══════ -->
+  <section class="steps">
+    <div class="steps-header">
+      <h2>Selenium <span class="gradient-text">Walkthrough</span></h2>
+      <p>13-step automated test covering every feature of ScrollIO</p>
+    </div>
+
+    <!-- STEP 1: Login -->
+    <div class="step" data-step="1">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(108, 99, 255, 0.15); color: var(--accent);">01</div>
+        <h3>Login Page</h3>
+        <div class="subtitle">Authentication Entry Point</div>
+        <p>
+          The login page is the gateway to ScrollIO. It features a glassmorphic card design
+          with email and password fields, a password visibility toggle, and Google OAuth option.
+        </p>
+        <ul class="step-features">
+          <li>Email and password form validation</li>
+          <li>Password visibility toggle (show/hide)</li>
+          <li>Error handling for invalid credentials</li>
+          <li>Google Sign-In integration (production mode)</li>
+          <li>Link to Sign Up for new users</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/02_login_filled.png" alt="Login Page with credentials filled" loading="lazy" />
+        <div class="img-label">02_login_filled.png — Credentials entered via Selenium</div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Dashboard -->
+    <div class="step" data-step="2">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(76, 175, 80, 0.15); color: var(--green);">02</div>
+        <h3>Dashboard</h3>
+        <div class="subtitle">Central Command Hub</div>
+        <p>
+          After successful login, users land on the Dashboard — a personalized hub displaying
+          a welcome message, action cards for each feature, and a history of recent summaries.
+        </p>
+        <ul class="step-features">
+          <li>Personalized welcome with user display name</li>
+          <li>Three action cards: Upload PDF, Summarize Text, Mind Maps</li>
+          <li>Recent summaries history with click-to-reload</li>
+          <li>Logout button with session clearance</li>
+          <li>Responsive card grid layout</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/05_dashboard.png" alt="Dashboard view" loading="lazy" />
+        <div class="img-label">05_dashboard.png — Dashboard with action cards</div>
+      </div>
+    </div>
+
+    <!-- STEP 3: PDF Upload -->
+    <div class="step" data-step="3">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(255, 152, 0, 0.15); color: var(--orange);">03</div>
+        <h3>PDF Upload</h3>
+        <div class="subtitle">Drag & Drop Document Input</div>
+        <p>
+          The PDF upload page features a full-screen drag-and-drop zone with an animated hero
+          section. Users can drag PDFs or click to browse. Files up to 50MB are supported.
+        </p>
+        <ul class="step-features">
+          <li>Drag & drop zone with visual hover feedback</li>
+          <li>Click-to-browse file selector (PDF only)</li>
+          <li>50MB file size limit with validation</li>
+          <li>File preview card with name and size</li>
+          <li>"Generate Summary & Mind Map" action button</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/08_pdf_upload_page.png" alt="PDF Upload page" loading="lazy" />
+        <div class="img-label">08_pdf_upload_page.png — Hero + drag-and-drop zone</div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Demo Mode -->
+    <div class="step" data-step="4">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(255, 107, 107, 0.15); color: #FF6B6B;">04</div>
+        <h3>Demo Mode</h3>
+        <div class="subtitle">Instant Feature Showcase</div>
+        <p>
+          The "Try Demo" button loads a pre-built Software Engineering course summary,
+          complete with AI-generated reels, mind map data, and structured notes — no API
+          call needed. This allows instant evaluation of all features.
+        </p>
+        <ul class="step-features">
+          <li>One-click demo activation</li>
+          <li>Pre-loaded summary with 5 modules</li>
+          <li>6 educational reels with key points</li>
+          <li>Mind map data auto-extracted from summary</li>
+          <li>Split-view layout activates immediately</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/11_demo_loaded.png" alt="Demo mode loaded" loading="lazy" />
+        <div class="img-label">11_demo_loaded.png — Demo loaded with reels visible</div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Reels -->
+    <div class="step" data-step="5">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(233, 30, 99, 0.15); color: var(--pink);">05</div>
+        <h3>Reels View</h3>
+        <div class="subtitle">Instagram-Style Learning Cards</div>
+        <p>
+          AI transforms documents into bite-sized, swipeable educational "reels" — each with a
+          title, narrative content, and 3 key takeaway points. Users can navigate with arrows
+          or pagination dots, and download all reels as images.
+        </p>
+        <ul class="step-features">
+          <li>Swipeable card carousel with pagination</li>
+          <li>Each reel has title, content, and key points</li>
+          <li>Numbered indicators (1/6, 2/6, etc.)</li>
+          <li>"Download All Reels" export feature</li>
+          <li>Gradient card design with smooth transitions</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/12_reels_view.png" alt="Reels view" loading="lazy" />
+        <div class="img-label">12_reels_view.png — Educational reel cards</div>
+      </div>
+    </div>
+
+    <!-- STEP 6: Summary -->
+    <div class="step" data-step="6">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(78, 205, 196, 0.15); color: var(--cyan);">06</div>
+        <h3>Summary View</h3>
+        <div class="subtitle">Structured AI Document Analysis</div>
+        <p>
+          The Summary tab presents a richly structured breakdown of the document including
+          overview, course objectives, modules, key concepts, insights, and references.
+          Content supports Markdown rendering with LaTeX math via KaTeX.
+        </p>
+        <ul class="step-features">
+          <li>Document title and overview extraction</li>
+          <li>Module-by-module breakdown with topics</li>
+          <li>Key concepts with definitions</li>
+          <li>Key insights and actionable takeaways</li>
+          <li>References and metadata extraction</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/14_summary_view.png" alt="Summary view" loading="lazy" />
+        <div class="img-label">14_summary_view.png — Structured AI summary output</div>
+      </div>
+    </div>
+
+    <!-- STEP 7: Mind Map -->
+    <div class="step" data-step="7">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(155, 89, 182, 0.15); color: #9B59B6;">07</div>
+        <h3>Mind Map</h3>
+        <div class="subtitle">Interactive D3.js Visualization</div>
+        <p>
+          The Mind Map tab transforms the summary into an interactive radial tree visualization
+          using D3.js. Nodes represent modules, topics, and concepts — users can zoom, pan,
+          and click nodes to explore relationships.
+        </p>
+        <ul class="step-features">
+          <li>D3.js radial tree with animated transitions</li>
+          <li>Auto-generated from summary JSON data</li>
+          <li>Zoom and pan with mouse/touch</li>
+          <li>Color-coded nodes by hierarchy depth</li>
+          <li>Responsive SVG rendering</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/17_mindmap_view.png" alt="Mind Map view" loading="lazy" />
+        <div class="img-label">17_mindmap_view.png — D3.js radial mind map</div>
+      </div>
+    </div>
+
+    <!-- STEP 8: AI Chat -->
+    <div class="step" data-step="8">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(231, 76, 60, 0.15); color: #E74C3C;">08</div>
+        <h3>AI Chat</h3>
+        <div class="subtitle">Context-Aware Document Chatbot</div>
+        <p>
+          The AI Chat tab opens a context-aware chatbot that understands the uploaded document.
+          Powered by a dual-engine architecture — Groq's Llama 3.1 for speed and Gemini for
+          embeddings — it answers questions directly from your document content.
+        </p>
+        <ul class="step-features">
+          <li>Chat interface with message bubbles</li>
+          <li>Context injected from extracted PDF text</li>
+          <li>Recommended question chips for quick queries</li>
+          <li>Dual AI engine: Groq (speed) + Gemini (quality)</li>
+          <li>Markdown rendering in chat responses</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/19_chat_view.png" alt="AI Chat view" loading="lazy" />
+        <div class="img-label">19_chat_view.png — AI chatbot interface</div>
+      </div>
+    </div>
+
+    <!-- STEP 9: Split Layout -->
+    <div class="step" data-step="9">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(33, 150, 243, 0.15); color: #2196F3;">09</div>
+        <h3>Split-Screen Layout</h3>
+        <div class="subtitle">PDF + AI Analysis Side by Side</div>
+        <p>
+          The results view uses a 45/55 split layout — PDF preview on the left, AI-generated
+          content on the right. A tab bar allows switching between Reels, Summary, Mind Map,
+          and AI Chat without losing context.
+        </p>
+        <ul class="step-features">
+          <li>45% PDF viewer / 55% AI output split</li>
+          <li>Persistent tab bar for rapid switching</li>
+          <li>Back button to return to upload screen</li>
+          <li>File name displayed in header</li>
+          <li>Regenerate button in tab bar</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/20_split_layout.png" alt="Split layout" loading="lazy" />
+        <div class="img-label">20_split_layout.png — PDF + analysis side by side</div>
+      </div>
+    </div>
+
+    <!-- STEP 10: Text Summarizer -->
+    <div class="step" data-step="10">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(255, 152, 0, 0.15); color: var(--orange);">10</div>
+        <h3>Text Summarizer</h3>
+        <div class="subtitle">Paste & Summarize Workflow</div>
+        <p>
+          The Text Summarizer page allows users to paste any text — notes, articles, chapters —
+          and generate the same structured AI summary without needing a PDF. Features a live
+          character counter and copy-to-clipboard functionality.
+        </p>
+        <ul class="step-features">
+          <li>Large textarea with placeholder guidance</li>
+          <li>Real-time character count display</li>
+          <li>Copy input text to clipboard</li>
+          <li>Same Gemini AI summarization engine</li>
+          <li>Output panel with structured summary</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/22_text_input.png" alt="Text Summarizer" loading="lazy" />
+        <div class="img-label">22_text_input.png — Text input with character count</div>
+      </div>
+    </div>
+
+    <!-- STEP 11: Navigation -->
+    <div class="step" data-step="11">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(108, 99, 255, 0.15); color: var(--accent);">11</div>
+        <h3>Navigation System</h3>
+        <div class="subtitle">Persistent Header & Routing</div>
+        <p>
+          A fixed header provides consistent navigation across all pages. It displays the
+          ScrollIO logo, navigation links (Dashboard, Summarize), the current file name, and
+          an "AI Powered" badge. React Router handles client-side routing.
+        </p>
+        <ul class="step-features">
+          <li>Fixed header with blur backdrop</li>
+          <li>Logo with animated gradient text</li>
+          <li>Active page indicator on nav buttons</li>
+          <li>Current file name display</li>
+          <li>React Router v7 client-side navigation</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/25_back_to_dashboard.png" alt="Navigation" loading="lazy" />
+        <div class="img-label">25_back_to_dashboard.png — Dashboard navigation</div>
+      </div>
+    </div>
+
+    <!-- STEP 12: Signup -->
+    <div class="step" data-step="12">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(76, 175, 80, 0.15); color: var(--green);">12</div>
+        <h3>Signup Page</h3>
+        <div class="subtitle">User Registration Flow</div>
+        <p>
+          New users can create accounts via the Signup page. It includes fields for full name,
+          email, password, and password confirmation — with validation for minimum length,
+          matching passwords, and duplicate email detection.
+        </p>
+        <ul class="step-features">
+          <li>Full name, email, password, confirm password</li>
+          <li>Minimum 6-character password validation</li>
+          <li>Password match verification</li>
+          <li>Duplicate email detection</li>
+          <li>Google Sign-Up option</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/27_signup_filled.png" alt="Signup Page" loading="lazy" />
+        <div class="img-label">27_signup_filled.png — Signup form completed</div>
+      </div>
+    </div>
+
+    <!-- STEP 13: Logout -->
+    <div class="step" data-step="13">
+      <div class="step-text">
+        <div class="step-number" style="background: rgba(244, 67, 54, 0.15); color: var(--red);">13</div>
+        <h3>Secure Logout</h3>
+        <div class="subtitle">Session Termination</div>
+        <p>
+          The logout flow clears the user session from localStorage, notifies all auth listeners,
+          and redirects to the login page. Protected routes automatically redirect unauthenticated
+          users, ensuring security.
+        </p>
+        <ul class="step-features">
+          <li>One-click logout from dashboard</li>
+          <li>Session cleared from localStorage</li>
+          <li>Auth state listeners notified</li>
+          <li>Redirect to login page</li>
+          <li>Protected routes guard all content</li>
+        </ul>
+      </div>
+      <div class="step-media">
+        <img src="/selenium_screenshots/29_logged_out.png" alt="Logged out" loading="lazy" />
+        <div class="img-label">29_logged_out.png — Redirected to login after logout</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ SELENIUM REPORT ═══════ -->
+  <section class="selenium-badge">
+    <div class="selenium-card">
+      <h3>🧪 Selenium Test Report</h3>
+      <p>Automated test executed via Python Selenium WebDriver + ChromeDriver</p>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="val">13/13</div>
+          <div class="lbl">Steps Passed</div>
+        </div>
+        <div class="result-item">
+          <div class="val">31</div>
+          <div class="lbl">Screenshots</div>
+        </div>
+        <div class="result-item">
+          <div class="val" style="color: var(--green);">PASS</div>
+          <div class="lbl">Status</div>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">To re-run the Selenium test:</p>
+      <div class="run-cmd">python3 selenium_test.py</div>
+    </div>
+  </section>
+
+  <!-- ═══════ SELENIUM CTA BANNER ═══════ -->
+  <section class="selenium-cta">
+    <div class="selenium-cta-card">
+      <h3>🌐 Powered by Selenium WebDriver</h3>
+      <p>
+        This entire walkthrough was automated using Selenium — the industry-standard
+        browser automation framework used by millions of developers worldwide.
+      </p>
+      <div class="selenium-cta-features">
+        <span class="feat">Cross-browser testing</span>
+        <span class="feat">Python + ChromeDriver</span>
+        <span class="feat">31 auto-captured screenshots</span>
+        <span class="feat">Open source</span>
+      </div>
+      <a href="https://www.selenium.dev/" target="_blank" class="btn-selenium-lg">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Visit selenium.dev →
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer>
+    <p>
+      ScrollIO &mdash; AI-Powered Study Platform &bull;
+      Built with React, Vite, Firebase, Gemini AI &bull;
+      Tested with <a href="https://www.selenium.dev/" target="_blank">Selenium WebDriver</a>
+    </p>
+    <p style="margin-top: 12px;">
+      <a href="https://www.selenium.dev/documentation/" target="_blank" style="margin: 0 10px;">Selenium Docs</a> &bull;
+      <a href="https://www.selenium.dev/downloads/" target="_blank" style="margin: 0 10px;">Downloads</a> &bull;
+      <a href="https://github.com/SeleniumHQ/selenium" target="_blank" style="margin: 0 10px;">GitHub</a>
+    </p>
+  </footer>
+
+  <!-- ═══════ SCROLL ANIMATIONS + CINEMA ═══════ -->
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.step').forEach(step => observer.observe(step));
+
+    // ─── Screenshot Cinema Player ───
+    (function() {
+      const screenshots = [
+        { file: '01_login_page.png', title: 'Step 1: Login Page' },
+        { file: '02_login_filled.png', title: 'Step 1: Credentials Entered' },
+        { file: '03_password_visible.png', title: 'Step 1: Password Toggle' },
+        { file: '04_after_login.png', title: 'Step 1: Login Submitted' },
+        { file: '05_dashboard.png', title: 'Step 2: Dashboard' },
+        { file: '06_dashboard_card_1.png', title: 'Step 2: PDF Upload Card' },
+        { file: '06_dashboard_card_2.png', title: 'Step 2: Text Summarizer Card' },
+        { file: '06_dashboard_card_3.png', title: 'Step 2: Mind Maps Card' },
+        { file: '07_dashboard_history.png', title: 'Step 2: Recent History' },
+        { file: '08_pdf_upload_page.png', title: 'Step 3: PDF Upload Page' },
+        { file: '09_pdf_hero.png', title: 'Step 3: Hero Section' },
+        { file: '10_demo_button.png', title: 'Step 4: Demo Button' },
+        { file: '11_demo_loaded.png', title: 'Step 4: Demo Loaded' },
+        { file: '12_reels_view.png', title: 'Step 5: Reels View' },
+        { file: '13_reels_detail.png', title: 'Step 5: Reel Detail' },
+        { file: '14_summary_view.png', title: 'Step 6: Summary View' },
+        { file: '15_summary_scrolled.png', title: 'Step 6: Summary Scrolled' },
+        { file: '16_summary_more.png', title: 'Step 6: More Summary' },
+        { file: '17_mindmap_view.png', title: 'Step 7: Mind Map' },
+        { file: '18_mindmap_detail.png', title: 'Step 7: Mind Map Detail' },
+        { file: '19_chat_view.png', title: 'Step 8: AI Chat' },
+        { file: '20_split_layout.png', title: 'Step 9: Split Layout' },
+        { file: '21_text_summarizer.png', title: 'Step 10: Text Summarizer' },
+        { file: '22_text_input.png', title: 'Step 10: Text Input' },
+        { file: '23_generate_button.png', title: 'Step 10: Generate Button' },
+        { file: '25_back_to_dashboard.png', title: 'Step 11: Navigation' },
+        { file: '26_signup_page.png', title: 'Step 12: Signup Page' },
+        { file: '27_signup_filled.png', title: 'Step 12: Signup Filled' },
+        { file: '28_logout_button.png', title: 'Step 13: Logout Button' },
+        { file: '29_logged_out.png', title: 'Step 13: Logged Out' },
+        { file: '30_walkthrough_complete.png', title: 'Walkthrough Complete' },
+      ];
+
+      let currentIdx = 0;
+      let isPlaying = false;
+      let intervalId = null;
+
+      const img = document.getElementById('cinemaImg');
+      const title = document.getElementById('cinemaTitle');
+      const counter = document.getElementById('cinemaCounter');
+      const progressFill = document.getElementById('cinemaProgressFill');
+      const playBtn = document.getElementById('cinemaPlayBtn');
+      const playIcon = document.getElementById('playIcon');
+      const pauseIcon = document.getElementById('pauseIcon');
+      const progressBar = document.getElementById('cinemaProgress');
+
+      function showFrame(idx) {
+        currentIdx = idx;
+        img.src = '/selenium_screenshots/' + screenshots[idx].file;
+        title.textContent = screenshots[idx].title;
+        counter.textContent = (idx + 1) + ' / ' + screenshots.length;
+        progressFill.style.width = ((idx + 1) / screenshots.length * 100) + '%';
+      }
+
+      function play() {
+        isPlaying = true;
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        intervalId = setInterval(function() {
+          currentIdx++;
+          if (currentIdx >= screenshots.length) {
+            currentIdx = 0; // loop
+          }
+          showFrame(currentIdx);
+        }, 2000);
+      }
+
+      function pause() {
+        isPlaying = false;
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        clearInterval(intervalId);
+      }
+
+      playBtn.addEventListener('click', function() {
+        if (isPlaying) { pause(); } else { play(); }
+      });
+
+      progressBar.addEventListener('click', function(e) {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        const idx = Math.floor(pct * screenshots.length);
+        showFrame(Math.max(0, Math.min(idx, screenshots.length - 1)));
+      });
+
+      // Auto-play when cinema comes into view
+      const cinemaObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting && !isPlaying) {
+            play();
+          } else if (!entry.isIntersecting && isPlaying) {
+            pause();
+          }
+        });
+      }, { threshold: 0.5 });
+      cinemaObs.observe(document.getElementById('cinemaPlayer'));
+
+      showFrame(0);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScrollIO — Complete Project Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--card:#12121a;--elevated:#1a1a28;--accent:#6C63FF;--accent-lt:#8B83FF;--pink:#E91E63;--green:#4CAF50;--orange:#FF9800;--cyan:#4ECDC4;--red:#F44336;--text:#f0f0f5;--text2:#a0a0b5;--muted:#606075;--border:rgba(255,255,255,0.06);--radius:16px}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(108,99,255,0.12),transparent),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(233,30,99,0.08),transparent)}
+
+    /* ─── Sticky Tab Nav ─── */
+    .tab-nav{position:sticky;top:0;z-index:100;display:flex;justify-content:center;gap:4px;padding:12px 24px;background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .tab-btn{padding:10px 24px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.3s}
+    .tab-btn:hover{color:var(--text);background:var(--elevated)}
+    .tab-btn.active{background:rgba(108,99,255,0.15);border-color:rgba(108,99,255,0.3);color:var(--accent-lt)}
+    .tab-content{display:none;position:relative;z-index:1}
+    .tab-content.active{display:block}
+
+    /* ─── Shared ─── */
+    .section{max-width:1000px;margin:0 auto;padding:60px 24px}
+    .section-center{text-align:center}
+    .gradient-text{background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h2.sec-title{font-size:28px;font-weight:700;margin-bottom:8px;text-align:center}
+    .sec-sub{text-align:center;font-size:15px;color:var(--text2);margin-bottom:40px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:transform 0.3s,border-color 0.3s}
+    .card:hover{transform:translateY(-4px);border-color:rgba(108,99,255,0.3)}
+
+    /* ─── Hero ─── */
+    .hero{text-align:center;padding:80px 24px 48px}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:100px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);font-size:11px;font-weight:600;color:var(--accent-lt);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:20px}
+    .hero-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s ease infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+    .hero h1{font-size:clamp(32px,5vw,48px);font-weight:800;letter-spacing:-1.5px;margin-bottom:12px}
+    .hero p{font-size:16px;color:var(--text2);max-width:600px;margin:0 auto 24px}
+    .hero-stats{display:flex;justify-content:center;gap:28px;flex-wrap:wrap}
+    .hero-stat .num{font-size:26px;font-weight:700;color:var(--accent-lt)}
+    .hero-stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .hero-actions{display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+    .btn-sel{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,#43B02A,#2E7D32);color:#fff;font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 0 20px rgba(67,176,42,0.3);transition:transform 0.3s}
+    .btn-sel:hover{transform:translateY(-3px)}
+    .btn-out{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:14px;font-weight:600;text-decoration:none;transition:transform 0.3s}
+    .btn-out:hover{transform:translateY(-3px);border-color:var(--accent)}
+
+    /* ─── Architecture Grid ─── */
+    .arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+    .arch-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px}
+    .card h4{font-size:16px;font-weight:600;margin-bottom:6px}
+    .card p{font-size:13px;color:var(--text2);line-height:1.6}
+
+    /* ─── Tech Pills ─── */
+    .tech-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:800px;margin:0 auto}
+    .pill{padding:8px 18px;border-radius:100px;background:var(--card);border:1px solid var(--border);font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px;transition:border-color 0.3s}
+    .pill:hover{border-color:var(--accent);color:var(--accent-lt)}
+    .pill .dot{width:8px;height:8px;border-radius:50%}
+
+    /* ─── Cinema ─── */
+    .cinema-player{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:#000;aspect-ratio:16/9;max-width:900px;margin:0 auto}
+    .cinema-player img{width:100%;height:100%;object-fit:contain;display:block}
+    .cinema-bar{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+    .cinema-play{width:36px;height:36px;border-radius:50%;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0}
+    .cinema-track{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.15);cursor:pointer}
+    .cinema-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .3s}
+    .cinema-lbl{font-size:12px;color:rgba(255,255,255,.7);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+    .cinema-title{position:absolute;top:16px;left:20px;padding:6px 14px;border-radius:8px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);font-size:13px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px}
+    .dot-live{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.5s ease infinite}
+
+    /* ─── Walkthrough Steps ─── */
+    .step{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;margin-bottom:80px;opacity:0;transform:translateY(40px);transition:opacity .6s,transform .6s}
+    .step.visible{opacity:1;transform:translateY(0)}
+    .step:nth-child(even) .step-text{order:2}
+    .step:nth-child(even) .step-media{order:1}
+    .step-number{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:12px}
+    .step-text h3{font-size:22px;font-weight:700;margin-bottom:8px}
+    .step-text .subtitle{font-size:14px;color:var(--accent-lt);font-weight:500;margin-bottom:12px}
+    .step-text p{font-size:14px;color:var(--text2);margin-bottom:16px}
+    .step-features{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .step-features li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)}
+    .step-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+    .step-media{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--card)}
+    .step-media img{width:100%;display:block;transition:transform .4s}
+    .step-media:hover img{transform:scale(1.02)}
+    .step-media .img-label{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;background:linear-gradient(transparent,rgba(10,10,15,.9));font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+    /* ─── Test Report Section ─── */
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:32px auto;max-width:800px}
+    .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center}
+    .stat .val{font-size:28px;font-weight:800}
+    .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+    .filter-bar{display:flex;gap:8px;justify-content:center;margin:32px 0 24px;flex-wrap:wrap}
+    .filter-btn{padding:8px 18px;border-radius:100px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+    .filter-btn:hover,.filter-btn.active{background:rgba(108,99,255,.15);border-color:rgba(108,99,255,.4);color:var(--accent-lt)}
+    .test-row{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;overflow:hidden;transition:border-color .3s}
+    .test-row:hover{border-color:rgba(108,99,255,.2)}
+    .test-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer}
+    .test-num{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(108,99,255,.1);color:var(--accent-lt);font-size:13px;font-weight:700;flex-shrink:0}
+    .test-name{font-size:15px;font-weight:600}
+    .test-desc{font-size:12px;color:var(--muted)}
+    .test-cat{font-size:11px;color:var(--text2);background:var(--elevated);padding:4px 10px;border-radius:100px}
+    .test-dur{font-size:13px;color:var(--text2);font-family:'JetBrains Mono',monospace}
+    .test-status{padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600}
+    .chevron{color:var(--muted);transition:transform .3s;flex-shrink:0}
+    .test-row.expanded .chevron{transform:rotate(180deg)}
+    .test-details{max-height:0;overflow:hidden;transition:max-height .4s,padding .3s;padding:0 20px}
+    .test-row.expanded .test-details{max-height:2000px;padding:0 20px 20px}
+
+    /* ─── Selenium CTA ─── */
+    .sel-cta{background:linear-gradient(135deg,rgba(67,176,42,.08),rgba(46,125,50,.08));border:1px solid rgba(67,176,42,.2);border-radius:var(--radius);padding:40px;text-align:center;position:relative;overflow:hidden;max-width:800px;margin:40px auto}
+    .sel-cta h3{font-size:24px;font-weight:700;margin-bottom:8px}
+    .sel-cta p{font-size:14px;color:var(--text2);margin-bottom:24px}
+    .sel-feats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+    .sel-feats span{font-size:13px;color:var(--text2)}
+    .sel-feats span::before{content:'✓ ';color:#43B02A;font-weight:700}
+
+    /* ─── Footer ─── */
+    footer{position:relative;z-index:1;text-align:center;padding:40px 24px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+    footer a{color:var(--accent-lt);text-decoration:none}
+
+    /* ─── Responsive ─── */
+    @media(max-width:768px){
+      .step{grid-template-columns:1fr}
+      .step:nth-child(even) .step-text{order:1}
+      .step:nth-child(even) .step-media{order:2}
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .hero-stats{gap:16px}
+      .tab-btn{padding:8px 14px;font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- ═══ STICKY TAB NAV ═══ -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('principle')">🏗️ Working Principle</button>
+    <button class="tab-btn" onclick="switchTab('walkthrough')">🎬 Test Walkthrough</button>
+    <button class="tab-btn" onclick="switchTab('report')">📊 Test Report</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  TAB 1: WORKING PRINCIPLE                              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="tab-principle" class="tab-content active">
+    <div class="hero">
+      <div class="hero-badge">ScrollIO AI Platform</div>
+      <h1><span class="gradient-text">ScrollIO</span><br/>Working Principle</h1>
+      <p>Complete system architecture and working mechanism of the AI-powered study platform, verified via Selenium automated testing.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="num">13</span><br/><span class="lbl">Test Steps</span></div>
+        <div class="hero-stat"><span class="num">31</span><br/><span class="lbl">Screenshots</span></div>
+        <div class="hero-stat"><span class="num">0</span><br/><span class="lbl">Failures</span></div>
+        <div class="hero-stat"><span class="num">100%</span><br/><span class="lbl">Pass Rate</span></div>
+      </div>
+      <div class="hero-actions">
+        <a href="https://www.selenium.dev/" target="_blank" class="btn-sel">🌐 Visit Selenium Website</a>
+        <a href="/" class="btn-out">🚀 Open ScrollIO App</a>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="section">
+      <h2 class="sec-title">System Architecture</h2>
+      <p class="sec-sub">How ScrollIO processes documents and delivers AI-powered study materials</p>
+      <div class="arch-grid">
+        <div class="card"><div class="arch-icon" style="background:rgba(108,99,255,.1);color:var(--accent)">🔐</div><h4>Authentication Layer</h4><p>Local auth system with email/password sign-in, sign-up, and session persistence via localStorage. Google OAuth available in production.</p></div>
+        <div class="card"><div class="arch-icon" style="background:rgba(255,152,0,.1);color:var(--orange)">📄</div><h4>PDF Processing Engine</h4><p>PDF.js extracts text from standard PDFs. For scanned documents, the file is converted to base64 and sent to Gemini Vision API for OCR extraction.</p></div>
+        <div class="card"><div class="arch-icon" style="background:rgba(76,175,80,.1);color:var(--green)">🤖</div><h4>Dual AI Engine</h4><p>Gemini API generates structured summaries, mind map data, and reels. Groq's Llama 3.1 powers the high-speed chatbot with context.</p></div>
+        <div class="card"><div class="arch-icon" style="background:rgba(233,30,99,.1);color:var(--pink)">🧠</div><h4>Visualization Layer</h4><p>D3.js renders interactive radial mind maps. React Markdown with KaTeX renders LaTeX equations. Summary uses structured JSON rendering.</p></div>
+        <div class="card"><div class="arch-icon" style="background:rgba(78,205,196,.1);color:var(--cyan)">🎬</div><h4>Reels Generator</h4><p>AI distills documents into Instagram-style educational cards with titles, content, and key points. Swipeable carousel with download support.</p></div>
+        <div class="card"><div class="arch-icon" style="background:rgba(244,67,54,.1);color:var(--red)">💾</div><h4>Storage & History</h4><p>LocalStorage persists user data, summaries, and reels. Dashboard displays history with one-click reload and delete functionality.</p></div>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="section section-center">
+      <h2 class="sec-title">Technology Stack</h2>
+      <div class="tech-pills" style="margin-top:24px">
+        <div class="pill"><span class="dot" style="background:#61DAFB"></span>React 19</div>
+        <div class="pill"><span class="dot" style="background:#646CFF"></span>Vite 8</div>
+        <div class="pill"><span class="dot" style="background:#FFCA28"></span>Firebase</div>
+        <div class="pill"><span class="dot" style="background:#4285F4"></span>Gemini API</div>
+        <div class="pill"><span class="dot" style="background:#FF6B6B"></span>Groq / Llama 3.1</div>
+        <div class="pill"><span class="dot" style="background:#F7931E"></span>D3.js</div>
+        <div class="pill"><span class="dot" style="background:#E34F26"></span>PDF.js</div>
+        <div class="pill"><span class="dot" style="background:#43B02A"></span>Selenium</div>
+        <div class="pill"><span class="dot" style="background:#3776AB"></span>Python 3.12</div>
+        <div class="pill"><span class="dot" style="background:#F06292"></span>React Router 7</div>
+        <div class="pill"><span class="dot" style="background:#26A69A"></span>KaTeX</div>
+        <div class="pill"><span class="dot" style="background:#AB47BC"></span>Lucide Icons</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  TAB 2: TEST WALKTHROUGH (Cinema + Steps)              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="tab-walkthrough" class="tab-content">
+    <!-- Cinema -->
+    <div class="section">
+      <h2 class="sec-title">Test <span class="gradient-text">Recording</span></h2>
+      <p class="sec-sub">Watch the Selenium test play through all captured screenshots</p>
+      <div class="cinema-player" id="cinemaPlayer">
+        <img id="cinemaImg" src="/selenium_screenshots/01_login_page.png" alt="Test recording"/>
+        <div class="cinema-title"><span class="dot-live"></span><span id="cinemaTitle">Step 1: Login Page</span></div>
+        <div class="cinema-bar">
+          <button class="cinema-play" id="cinemaPlayBtn" title="Play/Pause">
+            <svg id="playIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+            <svg id="pauseIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+          <div class="cinema-track" id="cinemaTrack"><div class="cinema-fill" id="cinemaFill" style="width:0"></div></div>
+          <span class="cinema-lbl" id="cinemaCounter">1 / 31</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step-by-step walkthrough -->
+    <div class="section">
+      <h2 class="sec-title" style="margin-bottom:48px">Selenium <span class="gradient-text">Walkthrough</span></h2>
+
+      <div class="step" data-step="1"><div class="step-text"><div class="step-number" style="background:rgba(108,99,255,.15);color:var(--accent)">01</div><h3>Login Page</h3><div class="subtitle">Authentication Entry Point</div><p>Glassmorphic login with email/password fields, password visibility toggle, and Google OAuth.</p><ul class="step-features"><li>Email and password validation</li><li>Password visibility toggle</li><li>Error handling for invalid credentials</li></ul></div><div class="step-media"><img src="/selenium_screenshots/02_login_filled.png" alt="Login" loading="lazy"/><div class="img-label">02_login_filled.png</div></div></div>
+
+      <div class="step" data-step="2"><div class="step-text"><div class="step-number" style="background:rgba(76,175,80,.15);color:var(--green)">02</div><h3>Dashboard</h3><div class="subtitle">Central Command Hub</div><p>Personalized hub with action cards, welcome message, and recent summaries history.</p><ul class="step-features"><li>Three action cards: Upload PDF, Summarize Text, Mind Maps</li><li>Recent summaries with click-to-reload</li><li>Responsive card grid</li></ul></div><div class="step-media"><img src="/selenium_screenshots/05_dashboard.png" alt="Dashboard" loading="lazy"/><div class="img-label">05_dashboard.png</div></div></div>
+
+      <div class="step" data-step="3"><div class="step-text"><div class="step-number" style="background:rgba(255,152,0,.15);color:var(--orange)">03</div><h3>PDF Upload</h3><div class="subtitle">Drag & Drop Document Input</div><p>Full-screen drag-and-drop zone with animated hero section. Files up to 50MB supported.</p><ul class="step-features"><li>Drag & drop with visual feedback</li><li>Click-to-browse file selector</li><li>File preview card with size</li></ul></div><div class="step-media"><img src="/selenium_screenshots/08_pdf_upload_page.png" alt="PDF Upload" loading="lazy"/><div class="img-label">08_pdf_upload_page.png</div></div></div>
+
+      <div class="step" data-step="4"><div class="step-text"><div class="step-number" style="background:rgba(255,107,107,.15);color:#FF6B6B">04</div><h3>Demo Mode</h3><div class="subtitle">Instant Feature Showcase</div><p>"Try Demo" loads a pre-built summary with reels, mind map data, and structured notes instantly.</p><ul class="step-features"><li>One-click demo activation</li><li>Pre-loaded summary with 5 modules</li><li>6 educational reels with key points</li></ul></div><div class="step-media"><img src="/selenium_screenshots/11_demo_loaded.png" alt="Demo" loading="lazy"/><div class="img-label">11_demo_loaded.png</div></div></div>
+
+      <div class="step" data-step="5"><div class="step-text"><div class="step-number" style="background:rgba(233,30,99,.15);color:var(--pink)">05</div><h3>Reels View</h3><div class="subtitle">Instagram-Style Learning Cards</div><p>AI transforms documents into swipeable educational reels with key takeaway points.</p><ul class="step-features"><li>Swipeable card carousel</li><li>"Download All Reels" export</li><li>Gradient card design</li></ul></div><div class="step-media"><img src="/selenium_screenshots/12_reels_view.png" alt="Reels" loading="lazy"/><div class="img-label">12_reels_view.png</div></div></div>
+
+      <div class="step" data-step="6"><div class="step-text"><div class="step-number" style="background:rgba(78,205,196,.15);color:var(--cyan)">06</div><h3>Summary View</h3><div class="subtitle">Structured AI Document Analysis</div><p>Richly structured breakdown with overview, modules, key concepts, insights, and references.</p><ul class="step-features"><li>Module-by-module breakdown</li><li>Key concepts with definitions</li><li>LaTeX math via KaTeX</li></ul></div><div class="step-media"><img src="/selenium_screenshots/14_summary_view.png" alt="Summary" loading="lazy"/><div class="img-label">14_summary_view.png</div></div></div>
+
+      <div class="step" data-step="7"><div class="step-text"><div class="step-number" style="background:rgba(155,89,182,.15);color:#9B59B6">07</div><h3>Mind Map</h3><div class="subtitle">Interactive D3.js Visualization</div><p>Interactive radial tree using D3.js with zoom, pan, and color-coded hierarchy nodes.</p><ul class="step-features"><li>D3.js radial tree with animations</li><li>Auto-generated from summary data</li><li>Responsive SVG rendering</li></ul></div><div class="step-media"><img src="/selenium_screenshots/17_mindmap_view.png" alt="Mind Map" loading="lazy"/><div class="img-label">17_mindmap_view.png</div></div></div>
+
+      <div class="step" data-step="8"><div class="step-text"><div class="step-number" style="background:rgba(231,76,60,.15);color:#E74C3C">08</div><h3>AI Chat</h3><div class="subtitle">Context-Aware Chatbot</div><p>Dual-engine chatbot — Groq's Llama 3.1 for speed and Gemini for embeddings.</p><ul class="step-features"><li>Context injected from PDF text</li><li>Recommended question chips</li><li>Markdown rendering in responses</li></ul></div><div class="step-media"><img src="/selenium_screenshots/19_chat_view.png" alt="Chat" loading="lazy"/><div class="img-label">19_chat_view.png</div></div></div>
+
+      <div class="step" data-step="9"><div class="step-text"><div class="step-number" style="background:rgba(33,150,243,.15);color:#2196F3">09</div><h3>Text Summarizer</h3><div class="subtitle">Paste & Summarize</div><p>Paste any text and get the same AI-structured summary. Live character counter included.</p><ul class="step-features"><li>Large textarea with guidance</li><li>Real-time character count</li><li>Same Gemini AI engine</li></ul></div><div class="step-media"><img src="/selenium_screenshots/22_text_input.png" alt="Summarizer" loading="lazy"/><div class="img-label">22_text_input.png</div></div></div>
+
+      <div class="step" data-step="10"><div class="step-text"><div class="step-number" style="background:rgba(244,67,54,.15);color:var(--red)">10</div><h3>Secure Logout</h3><div class="subtitle">Session Termination</div><p>One-click logout clears session, notifies auth listeners, and redirects to login.</p><ul class="step-features"><li>Session cleared from localStorage</li><li>Auth state listeners notified</li><li>Protected routes guard all content</li></ul></div><div class="step-media"><img src="/selenium_screenshots/29_logged_out.png" alt="Logout" loading="lazy"/><div class="img-label">29_logged_out.png</div></div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  TAB 3: TEST REPORT (dynamically loaded)               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="tab-report" class="tab-content">
+    <div class="section section-center">
+      <h2 class="sec-title" style="font-size:36px;margin-bottom:4px"><span class="gradient-text">Selenium</span> Test Report</h2>
+      <p class="sec-sub" style="margin-bottom:20px">Run <code style="background:var(--elevated);padding:4px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-lt)">python3 selenium_report.py</code> to generate live test data</p>
+      <div id="reportContent">
+        <div style="text-align:center;padding:60px 24px">
+          <p style="font-size:48px;margin-bottom:16px">🧪</p>
+          <h3 style="margin-bottom:8px">No Test Report Yet</h3>
+          <p style="color:var(--text2);max-width:400px;margin:0 auto 24px">Run the Selenium test suite to generate your test report with pass/fail results, timing data, and embedded screenshots.</p>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 24px;display:inline-block;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent-lt);user-select:all">python3 selenium_report.py</div>
+          <p style="color:var(--muted);font-size:12px;margin-top:16px">The report will appear here after running the test</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selenium CTA -->
+    <div class="section">
+      <div class="sel-cta">
+        <h3>🌐 Powered by Selenium WebDriver</h3>
+        <p>This entire walkthrough was automated using Selenium — the industry-standard browser automation framework.</p>
+        <div class="sel-feats">
+          <span>Cross-browser testing</span><span>Python + ChromeDriver</span><span>Auto-captured screenshots</span><span>Open source</span>
+        </div>
+        <a href="https://www.selenium.dev/" target="_blank" class="btn-sel" style="font-size:17px;padding:16px 36px">Visit selenium.dev →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <p>ScrollIO &mdash; AI-Powered Study Platform &bull; Built with React, Vite, Firebase, Gemini AI &bull; Tested with <a href="https://www.selenium.dev/" target="_blank">Selenium WebDriver</a></p>
+    <p style="margin-top:12px"><a href="https://www.selenium.dev/documentation/" target="_blank" style="margin:0 10px">Selenium Docs</a> &bull; <a href="https://www.selenium.dev/downloads/" target="_blank" style="margin:0 10px">Downloads</a> &bull; <a href="https://github.com/SeleniumHQ/selenium" target="_blank" style="margin:0 10px">GitHub</a></p>
+  </footer>
+
+  <script>
+    // ─── Tab Switching ───
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      event.target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ─── Scroll Reveal ───
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.step').forEach(s => obs.observe(s));
+
+    // ─── Screenshot Cinema ───
+    (function() {
+      const shots = [
+        { file: '01_login_page.png', title: 'Step 1: Login Page' },
+        { file: '02_login_filled.png', title: 'Step 1: Credentials Entered' },
+        { file: '03_password_visible.png', title: 'Step 1: Password Toggle' },
+        { file: '04_after_login.png', title: 'Step 1: Login Submitted' },
+        { file: '05_dashboard.png', title: 'Step 2: Dashboard' },
+        { file: '06_dashboard_card_1.png', title: 'Step 2: PDF Upload Card' },
+        { file: '06_dashboard_card_2.png', title: 'Step 2: Text Summarizer Card' },
+        { file: '06_dashboard_card_3.png', title: 'Step 2: Mind Maps Card' },
+        { file: '07_dashboard_history.png', title: 'Step 2: Recent History' },
+        { file: '08_pdf_upload_page.png', title: 'Step 3: PDF Upload' },
+        { file: '09_pdf_hero.png', title: 'Step 3: Hero Section' },
+        { file: '10_demo_button.png', title: 'Step 4: Demo Button' },
+        { file: '11_demo_loaded.png', title: 'Step 4: Demo Loaded' },
+        { file: '12_reels_view.png', title: 'Step 5: Reels View' },
+        { file: '13_reels_detail.png', title: 'Step 5: Reel Detail' },
+        { file: '14_summary_view.png', title: 'Step 6: Summary' },
+        { file: '15_summary_scrolled.png', title: 'Step 6: Summary Scrolled' },
+        { file: '16_summary_more.png', title: 'Step 6: More Summary' },
+        { file: '17_mindmap_view.png', title: 'Step 7: Mind Map' },
+        { file: '18_mindmap_detail.png', title: 'Step 7: Mind Map Detail' },
+        { file: '19_chat_view.png', title: 'Step 8: AI Chat' },
+        { file: '20_split_layout.png', title: 'Step 9: Split Layout' },
+        { file: '21_text_summarizer.png', title: 'Step 10: Text Summarizer' },
+        { file: '22_text_input.png', title: 'Step 10: Text Input' },
+        { file: '23_generate_button.png', title: 'Step 10: Generate Button' },
+        { file: '25_back_to_dashboard.png', title: 'Step 11: Navigation' },
+        { file: '26_signup_page.png', title: 'Step 12: Signup Page' },
+        { file: '27_signup_filled.png', title: 'Step 12: Signup Filled' },
+        { file: '28_logout_button.png', title: 'Step 13: Logout Button' },
+        { file: '29_logged_out.png', title: 'Step 13: Logged Out' },
+        { file: '30_walkthrough_complete.png', title: 'Walkthrough Complete' },
+      ];
+      let idx = 0, playing = false, timer;
+      const img = document.getElementById('cinemaImg');
+      const ttl = document.getElementById('cinemaTitle');
+      const cnt = document.getElementById('cinemaCounter');
+      const fill = document.getElementById('cinemaFill');
+      const playI = document.getElementById('playIcon');
+      const pauseI = document.getElementById('pauseIcon');
+
+      function show(i) { idx = i; img.src = '/selenium_screenshots/' + shots[i].file; ttl.textContent = shots[i].title; cnt.textContent = (i+1)+' / '+shots.length; fill.style.width = ((i+1)/shots.length*100)+'%'; }
+      function play() { playing = true; playI.style.display='none'; pauseI.style.display='block'; timer = setInterval(() => { idx = (idx+1) % shots.length; show(idx); }, 2000); }
+      function pause() { playing = false; playI.style.display='block'; pauseI.style.display='none'; clearInterval(timer); }
+
+      document.getElementById('cinemaPlayBtn').onclick = () => playing ? pause() : play();
+      document.getElementById('cinemaTrack').onclick = e => { const r = e.target.getBoundingClientRect(); show(Math.min(Math.floor((e.clientX-r.left)/r.width*shots.length), shots.length-1)); };
+
+      const cObs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting && !playing) play(); else if (!e.isIntersecting && playing) pause(); }); }, { threshold: 0.5 });
+      cObs.observe(document.getElementById('cinemaPlayer'));
+      show(0);
+    })();
+
+    // ─── Load existing test report if available ───
+    fetch('/selenium_report.html').then(r => { if (r.ok) return r.text(); throw ''; }).then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const container = doc.querySelector('.container');
+      if (container) {
+        document.getElementById('reportContent').innerHTML = container.innerHTML;
+        // Re-attach filter buttons
+        document.querySelectorAll('#reportContent .filter-btn').forEach(btn => {
+          btn.onclick = function() {
+            document.querySelectorAll('#reportContent .filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const status = this.textContent.includes('All') ? 'all' : this.textContent.includes('Passed') ? 'PASS' : this.textContent.includes('Failed') ? 'FAIL' : 'WARN';
+            document.querySelectorAll('#reportContent .test-row').forEach(row => { row.style.display = (status === 'all' || row.dataset.status === status) ? 'block' : 'none'; });
+          };
+        });
+        // Re-attach expand toggles
+        document.querySelectorAll('#reportContent .test-header').forEach(h => { h.onclick = () => h.parentElement.classList.toggle('expanded'); });
+      }
+    }).catch(() => {});
+  </script>
+</body>
+</html>

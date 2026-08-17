@@ -86,6 +86,8 @@ export default function ProfileSettings({ onClose }) {
               <option value="MECH">Mechanical Engineering</option>
               <option value="EEE">Electrical & Electronics</option>
               <option value="CIVIL">Civil Engineering</option>
+              <option value="IT">Information Technology</option>
+              <option value="AIDS">AI & Data Science</option>
             </select>
           </div>
           

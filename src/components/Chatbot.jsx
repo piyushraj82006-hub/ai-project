@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Trash2, ArrowLeft, Loader2, MessageSquare, Bot } from 'lucide-react';
 import { initializeVectorStore, chatWithRAG } from '../lib/rag';
-import { toast } from './Toast';
+import { toast } from '../lib/toast';
 
 export default function Chatbot({ text, pdfBase64, onClose }) {
   const [history, setHistory] = useState([]);

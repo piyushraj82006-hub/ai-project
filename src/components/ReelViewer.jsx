@@ -3,11 +3,14 @@ import { ChevronLeft, ChevronRight, Download, Loader, AlertCircle, BookOpen } fr
 
 export default function ReelViewer({ reels, status }) {
   const [current, setCurrent] = useState(0);
+  const [prevReels, setPrevReels] = useState(reels);
 
-  // Reset to first reel when data changes
-  useEffect(() => {
+  // Reset to the first reel when a new reel set arrives. Adjusting state
+  // during render (guarded by prevReels) avoids a setState-in-effect cascade.
+  if (reels !== prevReels) {
+    setPrevReels(reels);
     setCurrent(0);
-  }, [reels]);
+  }
 
   // Keyboard navigation
   useEffect(() => {

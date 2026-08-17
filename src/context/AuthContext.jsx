@@ -43,6 +43,9 @@ export function AuthProvider({ children }) {
   );
 }
 
+// useAuth intentionally lives with the context it reads; the provider is
+// the only component here, so fast refresh is unaffected.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');

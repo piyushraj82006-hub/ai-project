@@ -7,11 +7,16 @@ import TabBar from './TabBar';
 import SummaryOutput from './SummaryOutput';
 import MindMap from './MindMap';
 import ReelViewer from './ReelViewer';
+import QuizGenerator from './QuizGenerator';
+import Flashcards from './Flashcards';
+import YouTubeSearch from './YouTubeSearch';
+import PomodoroTimer from './PomodoroTimer';
 import { useAuth } from '../context/AuthContext';
 import { saveContent } from '../lib/storage';
-import { ToastContainer, toast } from './Toast';
+import { ToastContainer } from './Toast';
+import { toast } from '../lib/toast';
 import { extractTextFromFile, detectFileType, getFileTypeLabel, fileToBase64 } from '../lib/fileExtractor';
-import { summarizeWithGemini, extractMindMapData, generateReelsWithGemini } from '../lib/gemini';
+import { summarizeWithGemini, extractMindMapData, generateReelsWithGemini, generateQuizWithGemini, generateFlashcardsWithGemini, generateFlashcardsFromSummary } from '../lib/gemini';
 import Chatbot from './Chatbot';
 
 /**
@@ -96,6 +101,10 @@ export default function PDFApp() {
   const [mindMapData, setMindMapData] = useState(null);
   const [reels, setReels] = useState([]);
   const [reelStatus, setReelStatus] = useState('idle');
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [flashcards, setFlashcards] = useState([]);
+  const [flashcardLoading, setFlashcardLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('reels');
   const [subView, setSubView] = useState('text');
   const [loading, setLoading] = useState(false);
@@ -169,6 +178,8 @@ export default function PDFApp() {
     setMindMapData(null);
     setReels([]);
     setReelStatus('idle');
+    setQuizQuestions([]);
+    setFlashcards([]);
     setShowResults(false);
     setActiveTab('reels');
     setSubView('text');
@@ -326,6 +337,54 @@ export default function PDFApp() {
     }
   }, [file, user, fileType]);
 
+  const handleQuizGenerate = useCallback(async () => {
+    const text = extractedText || summary?.markdownContent || '';
+    if (!text) {
+      toast('Generate a summary first to create a quiz', 'error');
+      return;
+    }
+    setQuizLoading(true);
+    try {
+      const questions = await generateQuizWithGemini(text, pdfBase64Data);
+      setQuizQuestions(questions);
+      toast(`Quiz generated! ${questions.length} questions`, 'success');
+    } catch (err) {
+      console.error('Quiz generation failed:', err);
+      toast('Failed to generate quiz: ' + err.message, 'error');
+    } finally {
+      setQuizLoading(false);
+    }
+  }, [extractedText, summary, pdfBase64Data]);
+
+  const handleFlashcardGenerate = useCallback(async () => {
+    // First try generating from summary (no API call needed)
+    if (summary) {
+      const cards = generateFlashcardsFromSummary(summary);
+      if (cards.length > 0) {
+        setFlashcards(cards);
+        toast(`Flashcards created! ${cards.length} cards`, 'success');
+        return;
+      }
+    }
+    // Fallback to API-based generation
+    const text = extractedText || summary?.markdownContent || '';
+    if (!text) {
+      toast('Generate a summary first to create flashcards', 'error');
+      return;
+    }
+    setFlashcardLoading(true);
+    try {
+      const cards = await generateFlashcardsWithGemini(text, pdfBase64Data);
+      setFlashcards(cards);
+      toast(`Flashcards created! ${cards.length} cards`, 'success');
+    } catch (err) {
+      console.error('Flashcard generation failed:', err);
+      toast('Failed to generate flashcards: ' + err.message, 'error');
+    } finally {
+      setFlashcardLoading(false);
+    }
+  }, [summary, extractedText, pdfBase64Data]);
+
   const handleBack = useCallback(() => {
     setShowResults(false);
   }, []);
@@ -352,14 +411,14 @@ export default function PDFApp() {
                   onClick={handleDemo}
                   style={{
                     padding: '10px 22px', borderRadius: 'var(--radius-full)',
-                    background: 'rgba(108, 99, 255, 0.08)',
-                    border: '1px solid rgba(108, 99, 255, 0.2)',
+                    background: 'rgba(0, 122, 255, 0.08)',
+                    border: '1px solid rgba(0, 122, 255, 0.2)',
                     color: 'var(--accent-light)', fontSize: '13px', fontWeight: 500,
                     fontFamily: 'var(--font-body)', cursor: 'pointer',
                     transition: 'var(--transition-fast)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(108, 99, 255, 0.15)'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(108, 99, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(108, 99, 255, 0.2)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0, 122, 255, 0.15)'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0, 122, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(0, 122, 255, 0.2)'; }}
                 >
                   ✨ Try Demo — See sample output
                 </button>
@@ -374,7 +433,8 @@ export default function PDFApp() {
             <TabBar
               activeTab={activeTab} onTabChange={setActiveTab}
               onGenerate={handleGenerate} loading={loading}
-              hasFile={!!file} hasSummary={!!summary} hasReels={reels.length > 0}
+              hasFile={!!file} hasSummary={!!summary}
+              hasText={!!extractedText}
             />
             <div style={{
               flex: 1, display: 'flex', overflow: 'hidden',
@@ -399,6 +459,25 @@ export default function PDFApp() {
                   <ReelViewer reels={reels} status={reelStatus} />
                 ) : activeTab === 'mindmap' ? (
                   <MindMap data={mindMapData} onBack={() => setActiveTab('summary')} />
+                ) : activeTab === 'quiz' ? (
+                  <QuizGenerator
+                    questions={quizQuestions}
+                    onGenerate={handleQuizGenerate}
+                    loading={quizLoading}
+                    hasText={!!extractedText}
+                  />
+                ) : activeTab === 'flashcards' ? (
+                  <Flashcards
+                    cards={flashcards}
+                    onGenerate={handleFlashcardGenerate}
+                    loading={flashcardLoading}
+                    hasText={!!extractedText || !!summary}
+                  />
+                ) : activeTab === 'videos' ? (
+                  <YouTubeSearch
+                    documentTitle={summary?.documentTitle || file?.name || ''}
+                    keyConcepts={summary?.keyConcepts || []}
+                  />
                 ) : (
                   <SummaryOutput summary={summary} />
                 )}

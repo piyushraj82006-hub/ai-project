@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { Copy, Check, BookOpen, Network, FileDown, Loader } from 'lucide-react';
-import { toast } from './Toast';
+import { toast } from '../lib/toast';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';

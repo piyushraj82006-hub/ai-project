@@ -71,9 +71,10 @@ export default function Header({ fileName, showNav = false }) {
       }}>
         <span style={{
           padding: '4px 10px', borderRadius: 'var(--radius-full)',
-          background: 'rgba(108, 99, 255, 0.1)',
-          border: '1px solid rgba(108, 99, 255, 0.2)',
-          color: 'var(--accent-light)', fontSize: '11px', fontWeight: 500,
+          background: 'rgba(0, 122, 255, 0.1)',
+          border: '1px solid rgba(0, 122, 255, 0.22)',
+          color: 'var(--accent-light)', fontSize: '11px', fontWeight: 600,
+          letterSpacing: '0.2px',
         }}>
           AI Powered
         </span>
@@ -87,8 +88,8 @@ function NavBtn({ icon, label, active, onClick }) {
     <button onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: '6px',
       padding: '6px 14px', borderRadius: 'var(--radius-full)',
-      background: active ? 'rgba(108, 99, 255, 0.15)' : 'transparent',
-      border: active ? '1px solid rgba(108, 99, 255, 0.3)' : '1px solid transparent',
+      background: active ? 'rgba(0, 122, 255, 0.12)' : 'transparent',
+      border: active ? '1px solid rgba(0, 122, 255, 0.28)' : '1px solid transparent',
       color: active ? 'var(--accent-light)' : 'var(--text-secondary)',
       fontSize: '12px', fontWeight: 500, cursor: 'pointer',
       transition: 'var(--transition-fast)',

@@ -1,44 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-
-// Module-level toast state
-let _toasts = [];
-let _listeners = [];
-
-function notifyListeners() {
-  _listeners.forEach(fn => fn([..._toasts]));
-}
-
-/**
- * Show a toast notification
- * @param {string} message - Toast message
- * @param {'success'|'error'|'info'} type - Toast type
- * @param {number} duration - Auto-dismiss duration in ms
- */
-export function toast(message, type = 'info', duration = 4000) {
-  const id = Date.now() + Math.random();
-  _toasts.push({ id, message, type, duration });
-  notifyListeners();
-  
-  setTimeout(() => {
-    _toasts = _toasts.filter(t => t.id !== id);
-    notifyListeners();
-  }, duration);
-}
+import { useState, useEffect } from 'react';
+import { getToasts, subscribeToasts, dismissToast } from '../lib/toast';
 
 export function ToastContainer() {
-  const [toasts, setToasts] = useState([]);
-  
-  useEffect(() => {
-    _listeners.push(setToasts);
-    return () => {
-      _listeners = _listeners.filter(l => l !== setToasts);
-    };
-  }, []);
+  const [toasts, setToasts] = useState(getToasts);
 
-  const dismiss = useCallback((id) => {
-    _toasts = _toasts.filter(t => t.id !== id);
-    notifyListeners();
-  }, []);
+  useEffect(() => subscribeToasts(setToasts), []);
 
   if (toasts.length === 0) return null;
 
@@ -59,12 +25,12 @@ export function ToastContainer() {
       gap: '8px',
       maxWidth: '380px',
     }}>
-      {toasts.map((t, i) => {
+      {toasts.map(t => {
         const s = typeStyles[t.type] || typeStyles.info;
         return (
           <div
             key={t.id}
-            onClick={() => dismiss(t.id)}
+            onClick={() => dismissToast(t.id)}
             style={{
               background: s.bg,
               border: `1px solid ${s.border}`,

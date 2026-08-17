@@ -1,15 +1,13 @@
-import { LayoutGrid, BookOpen, Network, Sparkles, MessageSquare, Bot } from 'lucide-react';
+import { LayoutGrid, BookOpen, Network, Sparkles, MessageSquare, Bot, Brain, HelpCircle, Video } from 'lucide-react';
 
 export default function TabBar({
   activeTab,
   onTabChange,
-  subView,
-  onSubViewChange,
   onGenerate,
   loading,
   hasFile,
   hasSummary,
-  hasReels,
+  hasText,
 }) {
   return (
     <div style={{
@@ -103,6 +101,60 @@ export default function TabBar({
           >
             <MessageSquare size={15} />
             AI Chat
+          </button>
+        )}
+
+        {/* Quiz Tab */}
+        {(hasText || activeTab === 'quiz') && (
+          <button
+            onClick={() => onTabChange('quiz')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', borderRadius: 'var(--radius-full)',
+              background: activeTab === 'quiz' ? 'var(--gradient-accent)' : 'transparent',
+              border: 'none', color: activeTab === 'quiz' ? '#fff' : 'var(--text-secondary)',
+              fontSize: '13px', fontWeight: 600, fontFamily: 'var(--font-display)',
+              cursor: 'pointer', transition: 'var(--transition-fast)',
+            }}
+          >
+            <HelpCircle size={15} />
+            Quiz
+          </button>
+        )}
+
+        {/* Flashcards Tab */}
+        {(hasSummary || activeTab === 'flashcards') && (
+          <button
+            onClick={() => onTabChange('flashcards')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', borderRadius: 'var(--radius-full)',
+              background: activeTab === 'flashcards' ? 'var(--gradient-accent)' : 'transparent',
+              border: 'none', color: activeTab === 'flashcards' ? '#fff' : 'var(--text-secondary)',
+              fontSize: '13px', fontWeight: 600, fontFamily: 'var(--font-display)',
+              cursor: 'pointer', transition: 'var(--transition-fast)',
+            }}
+          >
+            <Brain size={15} />
+            Flashcards
+          </button>
+        )}
+
+        {/* Videos Tab */}
+        {(hasText || activeTab === 'videos') && (
+          <button
+            onClick={() => onTabChange('videos')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', borderRadius: 'var(--radius-full)',
+              background: activeTab === 'videos' ? 'var(--gradient-accent)' : 'transparent',
+              border: 'none', color: activeTab === 'videos' ? '#fff' : 'var(--text-secondary)',
+              fontSize: '13px', fontWeight: 600, fontFamily: 'var(--font-display)',
+              cursor: 'pointer', transition: 'var(--transition-fast)',
+            }}
+          >
+            <Video size={15} />
+            Videos
           </button>
         )}
       </div>

@@ -1,14 +1,21 @@
 import { BookOpen, Clock, Users, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function CourseList({ courses, onEnroll, enrolledCourseIds = [] }) {
+export default function CourseList({ courses, onEnroll, enrolledCourseIds = [], exploreBranch, exploreSemester }) {
   const navigate = useNavigate();
 
   if (!courses || courses.length === 0) {
     return (
       <div className="dashboard-empty">
         <BookOpen size={36} strokeWidth={1} />
-        <p>No courses found matching your criteria.</p>
+        {exploreBranch || exploreSemester ? (
+          <>
+            <p>No courses yet for <strong>{exploreBranch || 'this branch'}</strong>{exploreSemester ? ` — Semester ${exploreSemester}` : ''}.</p>
+            <p style={{ fontSize: '12px', opacity: 0.6 }}>Courses will appear here once they are added to the system.</p>
+          </>
+        ) : (
+          <p>No courses found. Try selecting a branch or semester above.</p>
+        )}
       </div>
     );
   }

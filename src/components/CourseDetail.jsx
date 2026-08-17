@@ -1,47 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCourse, getPYQs } from '../lib/db';
-import { 
-  ArrowLeft, BookOpen, PlayCircle, HelpCircle, 
-  FileText, Clock, ExternalLink, ChevronDown, ChevronUp 
+import courseData from '../../courseData.json';
+import {
+  ArrowLeft, BookOpen, PlayCircle, HelpCircle,
+  Clock, ExternalLink, ChevronDown, ChevronUp,
+  Youtube, Lightbulb, CheckCircle2
 } from 'lucide-react';
 
 export default function CourseDetail() {
   const { courseCode } = useParams();
   const navigate = useNavigate();
-  
-  const [course, setCourse] = useState(null);
-  const [pyqs, setPyqs] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Load course directly from local JSON — no API, no Firestore
+  const course = courseData.courses.find(c => c.code === courseCode) || null;
+
   const [activeTab, setActiveTab] = useState('syllabus');
   const [expandedModule, setExpandedModule] = useState(null);
+  // Per-module state: show Q&A or YouTube inline
+  const [moduleView, setModuleView] = useState({}); // { [index]: 'qa' | 'yt' | null }
 
-  useEffect(() => {
-    async function fetchDetails() {
-      setLoading(true);
-      try {
-        const [courseData, pyqData] = await Promise.all([
-          getCourse(courseCode),
-          getPYQs(courseCode)
-        ]);
-        setCourse(courseData);
-        setPyqs(pyqData);
-      } catch (err) {
-        console.error("Failed to load course details", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchDetails();
-  }, [courseCode]);
-
-  if (loading) {
-    return (
-      <div className="course-detail-page">
-        <div className="dashboard-loading"><span className="spinner"></span></div>
-      </div>
-    );
-  }
+  const toggleModuleView = (index, view) => {
+    setModuleView(prev => ({
+      ...prev,
+      [index]: prev[index] === view ? null : view,
+    }));
+  };
 
   if (!course) {
     return (
@@ -49,166 +32,267 @@ export default function CourseDetail() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={16} /> Back
         </button>
-        <div className="dashboard-empty">
+        <div className="dashboard-empty" style={{ marginTop: '60px' }}>
+          <BookOpen size={48} strokeWidth={1} />
           <h2>Course not found</h2>
-          <p>The course you are looking for does not exist.</p>
+          <p>No data found for <strong>{courseCode}</strong>. Add it to courseData.json to get started.</p>
         </div>
       </div>
     );
   }
 
+  // Group YouTube links by moduleIndex for fast lookup
+  const ytByModule = {};
+  course.youtubeLinks?.forEach(link => {
+    if (!ytByModule[link.moduleIndex]) ytByModule[link.moduleIndex] = [];
+    ytByModule[link.moduleIndex].push(link);
+  });
+
+  // Group importantQuestions by moduleIndex
+  const qByModule = {};
+  course.importantQuestions?.forEach(q => {
+    if (!qByModule[q.moduleIndex]) qByModule[q.moduleIndex] = [];
+    qByModule[q.moduleIndex].push(q);
+  });
+
   return (
     <div className="course-detail-page">
       <div className="dashboard-bg-glow" />
-      
+
+      {/* Header */}
       <header className="course-header">
         <button className="back-btn" onClick={() => navigate('/')}>
           <ArrowLeft size={16} /> Dashboard
         </button>
-        
+
         <div className="course-header-info">
           <div className="course-code-badge">{course.code}</div>
           <h1>{course.name}</h1>
           <div className="course-meta-large">
-            <span>{course.department}</span> • 
-            <span>Semester {course.semester}</span> • 
+            <span>{course.department}</span> •&nbsp;
+            <span>Semester {course.semester}</span> •&nbsp;
             <span>{course.credits} Credits</span>
           </div>
           <p className="course-description">{course.description}</p>
         </div>
       </header>
 
+      {/* Tabs */}
       <div className="course-tabs">
-        <button 
+        <button
           className={`course-tab ${activeTab === 'syllabus' ? 'active' : ''}`}
           onClick={() => setActiveTab('syllabus')}
         >
-          <BookOpen size={18} /> Syllabus
+          <BookOpen size={16} /> Syllabus
         </button>
-        <button 
-          className={`course-tab ${activeTab === 'media' ? 'active' : ''}`}
-          onClick={() => setActiveTab('media')}
-        >
-          <PlayCircle size={18} /> Media & Links
-        </button>
-        <button 
+        <button
           className={`course-tab ${activeTab === 'questions' ? 'active' : ''}`}
           onClick={() => setActiveTab('questions')}
         >
-          <HelpCircle size={18} /> Important Questions
+          <HelpCircle size={16} /> Important Questions
         </button>
-        <button 
-          className={`course-tab ${activeTab === 'pyqs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('pyqs')}
+        <button
+          className={`course-tab ${activeTab === 'media' ? 'active' : ''}`}
+          onClick={() => setActiveTab('media')}
         >
-          <FileText size={18} /> Previous Year Papers
+          <PlayCircle size={16} /> All Videos
         </button>
       </div>
 
+      {/* Content */}
       <div className="course-content">
-        {/* SYLLABUS TAB */}
+
+        {/* ── SYLLABUS TAB ── */}
         {activeTab === 'syllabus' && (
           <div className="syllabus-container">
-            {course.modules?.map((mod, index) => (
-              <div key={index} className="module-card">
-                <div 
-                  className="module-header"
-                  onClick={() => setExpandedModule(expandedModule === index ? null : index)}
-                >
-                  <div className="module-title">
-                    <span className="module-number">Module {index + 1}</span>
-                    <h3>{mod.title}</h3>
-                  </div>
-                  <div className="module-actions">
-                    <span className="module-hours"><Clock size={14} /> {mod.hours} hours</span>
-                    {expandedModule === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </div>
-                </div>
-                
-                {expandedModule === index && (
-                  <div className="module-body animate-fadeIn">
-                    <p>{mod.description}</p>
-                    <div className="module-topics">
-                      <h4>Topics:</h4>
-                      <ul>
-                        {mod.topics?.map((topic, i) => (
-                          <li key={i}>{topic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+            {course.modules?.length > 0 ? course.modules.map((mod, index) => {
+              const hasYt = (ytByModule[index]?.length ?? 0) > 0;
+              const hasQa = (qByModule[index]?.length ?? 0) > 0;
+              const isOpen = expandedModule === index;
 
-        {/* MEDIA TAB */}
-        {activeTab === 'media' && (
-          <div className="media-container">
-            {course.youtubeLinks?.length > 0 ? (
-              <div className="media-grid">
-                {course.youtubeLinks.map((link, idx) => (
-                  <a key={idx} href={link.url} target="_blank" rel="noreferrer" className="media-card">
-                    <div className="media-icon"><PlayCircle size={32} color="#FF0000" /></div>
-                    <div className="media-info">
-                      <h4>{link.title}</h4>
-                      <span className="media-module">Module {link.moduleIndex + 1}</span>
+              return (
+                <div key={index} className="module-card">
+                  {/* Module Header */}
+                  <div
+                    className="module-header"
+                    onClick={() => {
+                      setExpandedModule(isOpen ? null : index);
+                      // Reset inline view when collapsing
+                      if (isOpen) setModuleView(prev => ({ ...prev, [index]: null }));
+                    }}
+                  >
+                    <div className="module-title">
+                      <span className="module-number">Module {index + 1}</span>
+                      <h3>{mod.title}</h3>
                     </div>
-                    <ExternalLink size={16} className="external-icon" />
-                  </a>
-                ))}
-              </div>
-            ) : (
+                    <div className="module-actions">
+                      <span className="module-hours"><Clock size={13} /> {mod.hours}h</span>
+                      {hasYt && <span className="module-badge yt-badge"><Youtube size={12} /> {ytByModule[index].length}</span>}
+                      {hasQa && <span className="module-badge qa-badge"><HelpCircle size={12} /> {qByModule[index].length} Q</span>}
+                      {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </div>
+                  </div>
+
+                  {/* Module Body */}
+                  {isOpen && (
+                    <div className="module-body animate-fadeIn">
+                      <p className="module-desc">{mod.description}</p>
+
+                      {/* Topics */}
+                      <div className="module-topics">
+                        <h4>📌 Key Topics</h4>
+                        <ul>
+                          {mod.topics?.map((topic, i) => (
+                            <li key={i}><CheckCircle2 size={13} className="topic-check" />{topic}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="module-action-btns">
+                        {hasQa && (
+                          <button
+                            className={`mod-action-btn qa-btn ${moduleView[index] === 'qa' ? 'active' : ''}`}
+                            onClick={() => toggleModuleView(index, 'qa')}
+                          >
+                            <Lightbulb size={15} />
+                            {moduleView[index] === 'qa' ? 'Hide Questions' : 'Important Questions'}
+                          </button>
+                        )}
+                        {hasYt && (
+                          <button
+                            className={`mod-action-btn yt-btn ${moduleView[index] === 'yt' ? 'active' : ''}`}
+                            onClick={() => toggleModuleView(index, 'yt')}
+                          >
+                            <Youtube size={15} />
+                            {moduleView[index] === 'yt' ? 'Hide Videos' : `Watch Videos (${ytByModule[index].length})`}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Inline Q&A */}
+                      {moduleView[index] === 'qa' && (
+                        <div className="inline-qa animate-fadeIn">
+                          {qByModule[index].map((q, qi) => (
+                            <div key={qi} className="inline-question">
+                              <p className="iq-q">Q{qi + 1}: {q.question}</p>
+                              <p className="iq-a"><span>A:</span> {q.answer}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Inline YouTube */}
+                      {moduleView[index] === 'yt' && (
+                        <div className="inline-yt animate-fadeIn">
+                          {ytByModule[index].map((link, li) => (
+                            <a
+                              key={li}
+                              href={link.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-yt-link"
+                            >
+                              <Youtube size={18} color="#FF0000" />
+                              <span>{link.title}</span>
+                              <ExternalLink size={14} className="ext-icon" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            }) : (
               <div className="dashboard-empty">
-                <p>No media links available for this course.</p>
+                <BookOpen size={36} strokeWidth={1} />
+                <p>Syllabus modules not added yet for this course.</p>
               </div>
             )}
           </div>
         )}
 
-        {/* QUESTIONS TAB */}
+        {/* ── IMPORTANT QUESTIONS TAB (all modules) ── */}
         {activeTab === 'questions' && (
           <div className="questions-container">
             {course.importantQuestions?.length > 0 ? (
-              course.importantQuestions.map((q, idx) => (
-                <div key={idx} className="question-card">
-                  <div className="question-badge">Module {q.moduleIndex + 1}</div>
-                  <h4>Q: {q.question}</h4>
-                  <div className="answer-section">
-                    <strong>A: </strong>
-                    <p>{q.answer}</p>
-                  </div>
-                </div>
-              ))
+              <>
+                <p className="section-note">
+                  <Lightbulb size={14} /> Pre-curated important questions with answers for exam preparation.
+                </p>
+                {course.modules?.map((mod, modIdx) => {
+                  const qs = qByModule[modIdx] || [];
+                  if (qs.length === 0) return null;
+                  return (
+                    <div key={modIdx} className="q-module-section">
+                      <div className="q-module-label">
+                        <span className="module-number">Module {modIdx + 1}</span>
+                        <span>{mod.title}</span>
+                      </div>
+                      {qs.map((q, qi) => (
+                        <div key={qi} className="question-card">
+                          <p className="iq-q">Q{qi + 1}: {q.question}</p>
+                          <p className="iq-a"><span>A:</span> {q.answer}</p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </>
             ) : (
               <div className="dashboard-empty">
-                <p>No important questions available.</p>
+                <HelpCircle size={36} strokeWidth={1} />
+                <p>No important questions added yet for this course.</p>
+                <p style={{ fontSize: '12px', opacity: 0.5 }}>Add them to courseData.json under "importantQuestions".</p>
               </div>
             )}
           </div>
         )}
 
-        {/* PYQs TAB */}
-        {activeTab === 'pyqs' && (
-          <div className="pyq-container">
-            {pyqs?.length > 0 ? (
-              <div className="pyq-list">
-                {pyqs.map((pyq, idx) => (
-                  <div key={idx} className="pyq-card" onClick={() => navigate('/pdf', { state: { pyqUrl: pyq.url, title: `${course.code} ${pyq.year} ${pyq.examType}` } })}>
-                    <FileText size={24} />
-                    <div className="pyq-info">
-                      <h4>{pyq.examType} - {pyq.year}</h4>
-                      <span>Uploaded by {pyq.uploadedBy}</span>
+        {/* ── ALL VIDEOS TAB ── */}
+        {activeTab === 'media' && (
+          <div className="media-container">
+            {course.youtubeLinks?.length > 0 ? (
+              <>
+                <p className="section-note">
+                  <Youtube size={14} /> Curated video resources for each module.
+                </p>
+                {course.modules?.map((mod, modIdx) => {
+                  const links = ytByModule[modIdx] || [];
+                  if (links.length === 0) return null;
+                  return (
+                    <div key={modIdx} className="q-module-section">
+                      <div className="q-module-label">
+                        <span className="module-number">Module {modIdx + 1}</span>
+                        <span>{mod.title}</span>
+                      </div>
+                      <div className="media-grid">
+                        {links.map((link, li) => (
+                          <a
+                            key={li}
+                            href={link.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="media-card"
+                          >
+                            <div className="media-icon"><PlayCircle size={28} color="#FF0000" /></div>
+                            <div className="media-info">
+                              <h4>{link.title}</h4>
+                            </div>
+                            <ExternalLink size={14} className="external-icon" />
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                    <button className="btn-view">View & Summarize</button>
-                  </div>
-                ))}
-              </div>
+                  );
+                })}
+              </>
             ) : (
               <div className="dashboard-empty">
-                <FileText size={36} strokeWidth={1} />
-                <p>No Previous Year Questions available for this course yet.</p>
+                <PlayCircle size={36} strokeWidth={1} />
+                <p>No video links added yet for this course.</p>
+                <p style={{ fontSize: '12px', opacity: 0.5 }}>Add them to courseData.json under "youtubeLinks".</p>
               </div>
             )}
           </div>

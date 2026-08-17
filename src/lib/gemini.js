@@ -342,6 +342,147 @@ Rules:
 /**
  * Generate scrollable reel cards from PDF text using Gemini API (with model fallback)
  */
+/* ============================================
+   Quiz Generation
+   ============================================ */
+
+const QUIZ_SYSTEM_PROMPT = `You are an expert academic quiz creator. Generate a multiple-choice quiz from the given text.
+
+IMPORTANT: Return ONLY a valid JSON array, no markdown, no code fences.
+
+Create AT LEAST 10 questions. Each question must have this structure:
+{
+  "question": "The question text",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "correctIndex": 0,
+  "explanation": "Brief explanation of the correct answer"
+}
+
+Rules:
+- Questions should test understanding, not just recall
+- Mix difficulty levels: easy, medium, hard
+- Each question has exactly 4 options
+- correctIndex is 0-based (0=A, 1=B, 2=C, 3=D)
+- Explanations should be educational and concise
+- Cover ALL major topics from the document
+- Make distractors plausible but clearly wrong`;
+
+/**
+ * Generate quiz MCQs from document text using Gemini API
+ */
+export async function generateQuizWithGemini(text, pdfBase64 = null) {
+  const apiKeys = getApiKeys();
+  if (apiKeys.length === 0) throw new Error('Gemini API key is not configured on the server.');
+
+  const userPrompt = pdfBase64 && !text 
+    ? 'Create a quiz from the attached scanned PDF document.'
+    : `Create a quiz from this document:\n\n${text}`;
+
+  const parsed = await callAIWithFallback(apiKeys, QUIZ_SYSTEM_PROMPT, userPrompt, 'array', pdfBase64);
+  const questions = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.data || []);
+  
+  return questions.map((q, i) => ({
+    question: q.question || `Question ${i + 1}`,
+    options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+    correctIndex: typeof q.correctIndex === 'number' ? q.correctIndex : 0,
+    explanation: q.explanation || '',
+  }));
+}
+
+/**
+ * Generate flashcards from document text using Gemini API
+ */
+export async function generateFlashcardsWithGemini(text, pdfBase64 = null) {
+  const apiKeys = getApiKeys();
+  if (apiKeys.length === 0) throw new Error('Gemini API key is not configured on the server.');
+
+  const userPrompt = pdfBase64 && !text 
+    ? 'Create flashcards from the attached scanned PDF document.'
+    : `Create flashcards from this document:\n\n${text}`;
+
+  const parsed = await callAIWithFallback(apiKeys, FLASHCARD_SYSTEM_PROMPT, userPrompt, 'array', pdfBase64);
+  const cards = Array.isArray(parsed) ? parsed : (parsed.flashcards || parsed.data || []);
+  
+  return cards.map((c, i) => ({
+    front: c.front || c.term || `Term ${i + 1}`,
+    back: c.back || c.definition || 'Definition not available',
+    category: c.category || 'General',
+  }));
+}
+
+/**
+ * Generate flashcards from summary object (client-side, no API call)
+ */
+export function generateFlashcardsFromSummary(summary) {
+  if (!summary) return [];
+  const cards = [];
+
+  // Key Concepts -> Flashcards
+  if (summary.keyConcepts?.length) {
+    summary.keyConcepts.forEach(kc => {
+      cards.push({
+        front: kc.term || 'Concept',
+        back: kc.definition || 'No definition available',
+        category: 'Key Concepts',
+      });
+    });
+  }
+
+  // Key Takeaways -> Flashcards
+  if (summary.keyTakeaways?.length) {
+    summary.keyTakeaways.forEach((tk, i) => {
+      cards.push({
+        front: `Key Takeaway ${i + 1}`,
+        back: typeof tk === 'string' ? tk : JSON.stringify(tk),
+        category: 'Key Takeaways',
+      });
+    });
+  }
+
+  // Modules -> Flashcards
+  if (summary.modules?.length) {
+    summary.modules.forEach(mod => {
+      cards.push({
+        front: mod.title || 'Module',
+        back: mod.description || (mod.topics || []).join(', '),
+        category: 'Modules',
+      });
+    });
+  }
+
+  // Practice Questions -> Flashcards
+  if (summary.practiceQuestions?.length) {
+    summary.practiceQuestions.forEach(pq => {
+      cards.push({
+        front: pq.question || 'Question',
+        back: pq.answer || 'No answer available',
+        category: 'Practice Questions',
+      });
+    });
+  }
+
+  return cards;
+}
+
+const FLASHCARD_SYSTEM_PROMPT = `You are an expert academic study aid creator. Generate flashcards from the given text.
+
+IMPORTANT: Return ONLY a valid JSON array, no markdown, no code fences.
+
+Create AT LEAST 15 flashcards. Each flashcard must have this structure:
+{
+  "front": "The term, question, or concept",
+  "back": "The definition, answer, or explanation",
+  "category": "Category name (e.g., Key Terms, Definitions, Formulas, Concepts)"
+}
+
+Rules:
+- Front should be concise (a term, short question, or concept name)
+- Back should be clear and educational
+- Group related cards by category
+- Cover ALL important terms and concepts
+- Mix difficulty levels
+- Make backs detailed enough to learn from`;
+
 export async function generateReelsWithGemini(text, pdfBase64 = null) {
   const apiKeys = getApiKeys();
   if (apiKeys.length === 0) throw new Error('Gemini API key is not configured on the server.');

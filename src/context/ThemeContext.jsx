@@ -8,10 +8,9 @@ function getInitialTheme() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
-  } catch {}
-  // Fall back to system preference
-  if (window.matchMedia?.('(prefers-color-scheme: light)').matches) return 'light';
-  return 'dark';
+  } catch { /* localStorage may be unavailable (e.g., private browsing) */ }
+  // Premium minimal default — light, airy, Apple-like
+  return 'light';
 }
 
 export function ThemeProvider({ children }) {
@@ -23,7 +22,7 @@ export function ThemeProvider({ children }) {
     document.documentElement.setAttribute('data-theme', theme);
     try {
       localStorage.setItem(STORAGE_KEY, theme);
-    } catch {}
+    } catch { /* ignore quota / privacy-mode write failures */ }
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
@@ -37,6 +36,9 @@ export function ThemeProvider({ children }) {
   );
 }
 
+// useTheme intentionally lives with the context it reads; the provider is
+// the only component here, so fast refresh is unaffected.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme() {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider');

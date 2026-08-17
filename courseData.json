@@ -1,4 +1,13 @@
 {
+  "branches": [
+    { "code": "CSE",   "name": "Computer Science & Engineering",  "semesters": 8 },
+    { "code": "ECE",   "name": "Electronics & Communication",     "semesters": 8 },
+    { "code": "MECH",  "name": "Mechanical Engineering",          "semesters": 8 },
+    { "code": "EEE",   "name": "Electrical & Electronics",        "semesters": 8 },
+    { "code": "CIVIL", "name": "Civil Engineering",               "semesters": 8 },
+    { "code": "IT",    "name": "Information Technology",          "semesters": 8 },
+    { "code": "AIDS",  "name": "AI & Data Science",               "semesters": 8 }
+  ],
   "courses": [
     {
       "code": "BCSE302L",

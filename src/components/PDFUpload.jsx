@@ -4,6 +4,14 @@ import { getFileAcceptString } from '../lib/fileExtractor';
 
 const ALLOWED_EXTENSIONS = ['pdf', 'epub', 'docx'];
 
+/** File-type-specific icon (module scope so it isn't recreated every render) */
+function FileTypeIcon({ name, size = 20 }) {
+  const lower = name.toLowerCase();
+  if (lower.endsWith('.epub')) return <Book size={size} />;
+  if (lower.endsWith('.docx')) return <FileCode2 size={size} />;
+  return <FileText size={size} />;
+}
+
 export default function PDFUpload({ onFileSelect, file, onClear, onGenerate, loading }) {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef(null);
@@ -43,14 +51,6 @@ export default function PDFUpload({ onFileSelect, file, onClear, onGenerate, loa
       onFileSelect(selectedFile);
     }
   }, [onFileSelect]);
-
-  /** File-type-specific icon */
-  function FileTypeIcon({ name, size = 20 }) {
-    const lower = name.toLowerCase();
-    if (lower.endsWith('.epub')) return <Book size={size} />;
-    if (lower.endsWith('.docx')) return <FileCode2 size={size} />;
-    return <FileText size={size} />;
-  }
 
   if (file) {
     return (

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import { ZoomIn, ZoomOut, RotateCcw, Copy, Check, Maximize2, Minimize2, X } from 'lucide-react';
-import { toast } from './Toast';
+import { toast } from '../lib/toast';
 
 const BRANCH_COLORS = {
   modules: '#6C63FF',

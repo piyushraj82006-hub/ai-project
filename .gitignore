@@ -22,10 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.junie
-*.freebuff
-*.agents/workflows
-*.agents
-*.claude
-*.kilo
-*.junie
+
+# AI Agent / Skills directories (local tooling, not project source)
+.agent/
+.agents/
+.gemini/
+.claude/
+.kilo/
+.junie/
+.freebuff/
+.gsd/

@@ -1,6 +1,7 @@
+/* global process */
 import fs from 'fs';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // ─── Firebase Config (Copied from src/lib/firebase.js) ───
 const firebaseConfig = {

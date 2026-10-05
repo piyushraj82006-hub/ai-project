@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { Search, Play, ExternalLink, Loader, Video, X } from 'lucide-react';
-import { toast } from '../lib/toast';
 
 /**
  * YouTube Video Search component
@@ -33,7 +32,7 @@ export default function YouTubeSearch({ documentTitle, keyConcepts }) {
         const data = await response.json();
         setResults(data.items || []);
       } else {
-        // No API key — show placeholder results with direct YouTube search links
+        // No API key - show placeholder results with direct YouTube search links
         // Generate topic-based suggestions from key concepts
         const suggestions = (keyConcepts || []).slice(0, 6).map((kc, i) => ({
           id: { videoId: `search_${i}` },
@@ -120,7 +119,7 @@ export default function YouTubeSearch({ documentTitle, keyConcepts }) {
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder="Search for tutorials..."
+              placeholder={documentTitle ? `Search tutorials for "${documentTitle}"...` : 'Search for tutorials...'}
               style={{
                 flex: 1, background: 'none', border: 'none',
                 color: 'var(--text-primary)', fontSize: '13px',

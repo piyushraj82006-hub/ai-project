@@ -116,7 +116,7 @@ async function extractDOCX(file) {
 }
 
 /**
- * Universal file text extractor — routes to the correct engine based on file type
+ * Universal file text extractor - routes to the correct engine based on file type
  * @param {File} file
  * @param {number} maxChars
  * @returns {Promise<{text: string, fileType: string, needsVision: boolean}>}

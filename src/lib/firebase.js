@@ -41,7 +41,7 @@ async function ensureUserDoc(firebaseUser) {
   const userSnap = await getDoc(userRef);
 
   if (!userSnap.exists()) {
-    // First-time user — create doc
+    // First-time user - create doc
     await setDoc(userRef, {
       displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
       email: firebaseUser.email,
@@ -54,7 +54,7 @@ async function ensureUserDoc(firebaseUser) {
       updatedAt: serverTimestamp(),
     });
   } else {
-    // Returning user — update last login timestamp
+    // Returning user - update last login timestamp
     await setDoc(userRef, { updatedAt: serverTimestamp() }, { merge: true });
   }
 }

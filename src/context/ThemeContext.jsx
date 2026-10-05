@@ -8,8 +8,7 @@ function getInitialTheme() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
-  } catch { /* localStorage may be unavailable (e.g., private browsing) */ }
-  // Premium minimal default — light, airy, Apple-like
+  } catch { /* localStorage may be unavailable (e.g., private browsing) */ }   // Premium minimal default - light, airy, Apple-like
   return 'light';
 }
 

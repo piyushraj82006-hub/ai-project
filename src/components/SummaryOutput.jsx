@@ -305,7 +305,6 @@ export default function SummaryOutput({ summary }) {
     return (
       <div style={{ padding: '24px', height: '100%', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px', gap: '8px' }}>
-          {onViewMindMap && <ViewMindMapBtn onClick={onViewMindMap} />}
           <ExportPdfBtn exporting={exporting} onClick={handleExportPDF} />
           <CopyBtn copied={copied} onClick={handleCopy} />
         </div>
@@ -408,20 +407,20 @@ export default function SummaryOutput({ summary }) {
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex]}
             components={{
-              h1: ({node, ...props}) => <h1 style={{ fontSize: '26px', fontWeight: 700, marginBottom: '24px', color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginTop: '16px' }} {...props} />,
-              h2: ({node, ...props}) => <h2 style={{ fontSize: '22px', fontWeight: 600, marginTop: '36px', marginBottom: '16px', color: '#A78BFA' }} {...props} />,
-              h3: ({node, ...props}) => <h3 style={{ fontSize: '18px', fontWeight: 600, marginTop: '24px', marginBottom: '12px', color: '#38BDF8' }} {...props} />,
-              p: ({node, ...props}) => <p style={{ fontSize: '15px', lineHeight: 1.75, marginBottom: '20px', color: 'var(--text-secondary)' }} {...props} />,
-              ul: ({node, ...props}) => <ul style={{ marginBottom: '20px', paddingLeft: '24px', color: 'var(--text-secondary)' }} {...props} />,
-              ol: ({node, ...props}) => <ol style={{ marginBottom: '20px', paddingLeft: '24px', color: 'var(--text-secondary)' }} {...props} />,
-              li: ({node, ...props}) => <li style={{ marginBottom: '8px', lineHeight: 1.6 }} {...props} />,
-              table: ({node, ...props}) => <div style={{ overflowX: 'auto', marginBottom: '24px', width: '100%', borderRadius: '8px', border: '1px solid var(--border-color)' }}><table style={{ width: '100%', borderCollapse: 'collapse' }} {...props} /></div>,
-              th: ({node, ...props}) => <th style={{ padding: '14px', textAlign: 'left', background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--border-color)', color: '#fff', fontSize: '14px', fontWeight: 600 }} {...props} />,
-              td: ({node, ...props}) => <td style={{ padding: '14px', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '14px' }} {...props} />,
-              strong: ({node, ...props}) => <strong style={{ color: '#fff', fontWeight: 600 }} {...props} />,
-              hr: ({node, ...props}) => <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0' }} {...props} />,
-              blockquote: ({node, ...props}) => <blockquote style={{ borderLeft: '4px solid #F472B6', marginLeft: 0, marginRight: 0, padding: '16px 20px', color: 'var(--text-secondary)', fontStyle: 'italic', margin: '24px 0', background: 'rgba(244, 114, 182, 0.05)', borderRadius: '0 8px 8px 0' }} {...props} />,
-              code: ({node, inline, ...props}) => inline ? <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '13px', color: '#F472B6', fontFamily: 'var(--font-mono)' }} {...props} /> : <div style={{ marginBottom: '20px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}><pre style={{ background: '#111827', padding: '16px', overflowX: 'auto', margin: 0 }}><code style={{ color: '#e2e2e8', fontSize: '14px', fontFamily: 'var(--font-mono)' }} {...props} /></pre></div>
+              h1: ({...props}) => <h1 style={{ fontSize: '26px', fontWeight: 700, marginBottom: '24px', color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginTop: '16px' }} {...props} />,
+              h2: ({...props}) => <h2 style={{ fontSize: '22px', fontWeight: 600, marginTop: '36px', marginBottom: '16px', color: '#A78BFA' }} {...props} />,
+              h3: ({...props}) => <h3 style={{ fontSize: '18px', fontWeight: 600, marginTop: '24px', marginBottom: '12px', color: '#38BDF8' }} {...props} />,
+              p: ({...props}) => <p style={{ fontSize: '15px', lineHeight: 1.75, marginBottom: '20px', color: 'var(--text-secondary)' }} {...props} />,
+              ul: ({...props}) => <ul style={{ marginBottom: '20px', paddingLeft: '24px', color: 'var(--text-secondary)' }} {...props} />,
+              ol: ({...props}) => <ol style={{ marginBottom: '20px', paddingLeft: '24px', color: 'var(--text-secondary)' }} {...props} />,
+              li: ({...props}) => <li style={{ marginBottom: '8px', lineHeight: 1.6 }} {...props} />,
+              table: ({...props}) => <div style={{ overflowX: 'auto', marginBottom: '24px', width: '100%', borderRadius: '8px', border: '1px solid var(--border-color)' }}><table style={{ width: '100%', borderCollapse: 'collapse' }} {...props} /></div>,
+              th: ({...props}) => <th style={{ padding: '14px', textAlign: 'left', background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--border-color)', color: '#fff', fontSize: '14px', fontWeight: 600 }} {...props} />,
+              td: ({...props}) => <td style={{ padding: '14px', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '14px' }} {...props} />,
+              strong: ({...props}) => <strong style={{ color: '#fff', fontWeight: 600 }} {...props} />,
+              hr: ({...props}) => <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0' }} {...props} />,
+              blockquote: ({...props}) => <blockquote style={{ borderLeft: '4px solid #F472B6', marginLeft: 0, marginRight: 0, padding: '16px 20px', color: 'var(--text-secondary)', fontStyle: 'italic', margin: '24px 0', background: 'rgba(244, 114, 182, 0.05)', borderRadius: '0 8px 8px 0' }} {...props} />,
+              code: ({inline, ...props}) => inline ? <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '13px', color: '#F472B6', fontFamily: 'var(--font-mono)' }} {...props} /> : <div style={{ marginBottom: '20px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}><pre style={{ background: '#111827', padding: '16px', overflowX: 'auto', margin: 0 }}><code style={{ color: '#e2e2e8', fontSize: '14px', fontFamily: 'var(--font-mono)' }} {...props} /></pre></div>
             }}
           >
             {summary.markdownContent}
@@ -431,11 +430,11 @@ export default function SummaryOutput({ summary }) {
         <>
           {/* ─── Key Takeaways (Legacy JSON) ─── */}
       {summary.keyTakeaways?.length > 0 && (
-        <NoteSection title="Key Takeaways" color="#10B981">
+        <NoteSection title="Key Takeaways" color="#d4940a">
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {summary.keyTakeaways.map((item, i) => (
               <li key={i} style={{ display: 'flex', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                <span style={{ color: '#10B981', marginTop: '2px' }}>•</span>
+                <span style={{ color: '#d4940a', marginTop: '2px' }}>•</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -647,7 +646,7 @@ export default function SummaryOutput({ summary }) {
 /* ─── Sub-components ─── */
 
 /**
- * Always-open section with colored heading — NO collapsing.
+ * Always-open section with colored heading - NO collapsing.
  */
 function NoteSection({ title, color, children }) {
   return (

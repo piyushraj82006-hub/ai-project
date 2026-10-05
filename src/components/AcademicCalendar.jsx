@@ -14,7 +14,7 @@ const EVENT_TYPES = [
   { value: 'project_review', label: 'Project Review', icon: ClipboardCheck, color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.12)' },
   { value: 'submission', label: 'Submission', icon: FileText, color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)' },
   { value: 'exam', label: 'FAT / Exam', icon: Award, color: '#EF4444', bg: 'rgba(239, 68, 68, 0.12)' },
-  { value: 'other', label: 'Other', icon: BookOpen, color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)' },
+  { value: 'other', label: 'Other', icon: BookOpen, color: '#d4940a', bg: 'rgba(212, 148, 10, 0.12)' },
 ];
 
 function getEventType(value) {
@@ -41,7 +41,7 @@ export default function AcademicCalendar() {
   const [selectedDate, setSelectedDate] = useState(null);
 
   // Calendar state
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [viewYear, setViewYear] = useState(today.getFullYear());
 
@@ -113,13 +113,13 @@ export default function AcademicCalendar() {
       .filter(dl => dl.date >= todayStr)
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 10);
-  }, [deadlines]);
+  }, [deadlines, today]);
 
   // Past deadlines count
   const pastCount = useMemo(() => {
     const todayStr = toDateStr(today);
     return deadlines.filter(dl => dl.date < todayStr).length;
-  }, [deadlines]);
+  }, [deadlines, today]);
 
   const prevMonth = () => {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
@@ -205,8 +205,6 @@ export default function AcademicCalendar() {
 
   return (
     <div className="cal-page">
-      <div className="dashboard-bg-glow" />
-
       {/* Header */}
       <header className="cal-header">
         <button className="back-btn" onClick={() => navigate('/')}>

@@ -1,10 +1,21 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, ZoomIn, ZoomOut, FileText } from 'lucide-react';
 
 export default function PDFViewer({ file, onBack }) {
-  const objectUrl = useMemo(() => {
-    if (file) return URL.createObjectURL(file);
-    return null;
+  const [objectUrl, setObjectUrl] = useState(null);
+
+  useEffect(() => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      // Object URLs must be created in an effect so they can be revoked on cleanup
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setObjectUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+        setObjectUrl(null);
+      };
+    }
+    setObjectUrl(null);
   }, [file]);
 
   if (!file || !objectUrl) {

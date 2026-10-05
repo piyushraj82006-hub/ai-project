@@ -12,7 +12,7 @@ import Flashcards from './Flashcards';
 import YouTubeSearch from './YouTubeSearch';
 import PomodoroTimer from './PomodoroTimer';
 import { useAuth } from '../context/AuthContext';
-import { saveContent } from '../lib/storage';
+import { saveContent, updateSavedContent, getSummaries } from '../lib/storage';
 import { ToastContainer } from './Toast';
 import { toast } from '../lib/toast';
 import { extractTextFromFile, detectFileType, getFileTypeLabel, fileToBase64 } from '../lib/fileExtractor';
@@ -106,12 +106,12 @@ export default function PDFApp() {
   const [flashcards, setFlashcards] = useState([]);
   const [flashcardLoading, setFlashcardLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('reels');
-  const [subView, setSubView] = useState('text');
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [extractedText, setExtractedText] = useState('');
   const [pdfBase64Data, setPdfBase64Data] = useState(null);
   const [fileType, setFileType] = useState(null);
+  const [currentEntryId, setCurrentEntryId] = useState(null);
   const location = useLocation();
 
   const handleFileSelect = useCallback((selectedFile) => {
@@ -130,24 +130,54 @@ export default function PDFApp() {
     setMindMapData(null);
     setReels([]);
     setReelStatus('idle');
+    setQuizQuestions([]);
+    setFlashcards([]);
+    setCurrentEntryId(null);
     setShowResults(false);
     setActiveTab('reels');
-    setSubView('text');
     setExtractedText('');
     setPdfBase64Data(null);
     toast(`${getFileTypeLabel(detectedType)} uploaded successfully`, 'success');
-  }, []);
+
+    // Check last 2 processed summaries for caching
+    if (user) {
+      const summaries = getSummaries(user.uid);
+      const cleanedName = selectedFile.name.replace(/\.[^/.]+$/, "").trim().toLowerCase();
+      
+      // Look at the last two saved summaries
+      const cached = summaries.slice(0, 2).find(s => {
+        const titleMatch = s.title && s.title.trim().toLowerCase() === cleanedName;
+        const fileMatch = s.fileName && s.fileName.trim().toLowerCase() === selectedFile.name.trim().toLowerCase();
+        return titleMatch || fileMatch;
+      });
+
+      if (cached) {
+        setSummary(cached.summary);
+        setMindMapData(extractMindMapData(cached.summary));
+        setReels(cached.reels || []);
+        setReelStatus('completed');
+        setQuizQuestions(cached.quiz || []);
+        setFlashcards(cached.flashcards || []);
+        setCurrentEntryId(cached.id);
+        setShowResults(true);
+        setActiveTab('summary');
+        toast('Restored previous analysis from cache!', 'success');
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     if (location.state?.loadSummary) {
-      const { loadSummary, loadReels } = location.state;
+      const { loadSummary, loadReels, id, quiz, flashcards } = location.state;
       setSummary(loadSummary);
       setMindMapData(extractMindMapData(loadSummary));
       setReels(loadReels || []);
       setReelStatus('completed');
+      setQuizQuestions(quiz || []);
+      setFlashcards(flashcards || []);
+      setCurrentEntryId(id || null);
       setShowResults(true);
       setActiveTab('summary');
-      setSubView('text');
       setTimeout(() => toast('Loaded from history', 'info'), 500);
       
       // Clear state so it doesn't reload on refresh
@@ -169,7 +199,7 @@ export default function PDFApp() {
       loadPYQ();
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state, navigate, handleFileSelect]);
+  }, [location.state, location.pathname, navigate, handleFileSelect]);
 
   const handleClearFile = useCallback(() => {
     setFile(null);
@@ -182,14 +212,13 @@ export default function PDFApp() {
     setFlashcards([]);
     setShowResults(false);
     setActiveTab('reels');
-    setSubView('text');
     setExtractedText('');
     setPdfBase64Data(null);
   }, []);
 
   const handleDemo = useCallback(() => {
     const demoSummary = {
-      documentTitle: "Software Engineering — BCSE302L",
+      documentTitle: "Software Engineering - BCSE302L",
       overview: "A comprehensive course covering software engineering principles, methodologies, and practices including requirements engineering, software design, testing strategies, and project management.",
       courseObjectives: [
         "Understand fundamental software engineering concepts and process models",
@@ -217,7 +246,7 @@ export default function PDFApp() {
         { term: "Agile Methodology", definition: "Iterative development delivering working software in short sprints." },
         { term: "Design Patterns", definition: "Reusable solutions to common software design problems (Creational, Structural, Behavioral)." },
         { term: "TDD", definition: "Tests written before code, following Red-Green-Refactor cycle." },
-        { term: "COCOMO", definition: "Constructive Cost Model — estimates effort and schedule from project size in KLOC." }
+        { term: "COCOMO", definition: "Constructive Cost Model - estimates effort and schedule from project size in KLOC." }
       ],
       keyInsights: [
         "Modern SE emphasizes iterative development over waterfall",
@@ -227,18 +256,18 @@ export default function PDFApp() {
         "Risk management should be proactive, not reactive"
       ],
       references: [
-        "Software Engineering: A Practitioner's Approach — Pressman, 9th Ed",
-        "Software Engineering — Sommerville, 10th Ed",
-        "Design Patterns — Gang of Four"
+        "Software Engineering: A Practitioner's Approach - Pressman, 9th Ed",
+        "Software Engineering - Sommerville, 10th Ed",
+        "Design Patterns - Gang of Four"
       ],
       conclusion: "This course provides a comprehensive SE foundation for designing, developing, testing, and managing large-scale software systems.",
       metadata: { courseCode: "BCSE302L", credits: "4", prerequisite: "Programming Fundamentals", totalHours: "30" }
     };
     const demoReels = [
-      { title: "What Is Software Engineering?", content: "Software engineering is all about applying systematic, disciplined approaches to software development. It emerged from the 'software crisis' of the 1960s, when projects kept failing spectacularly — going way over budget and delivering buggy software.", keyPoints: ["Born from the 1960s software crisis", "Systematic approach to building software", "Focuses on quality, cost, and schedule"], index: 0 },
-      { title: "Process Models That Actually Work", content: "From the classic Waterfall model to modern Agile and Scrum, different situations call for different approaches. Waterfall works for well-defined projects, while Agile shines when requirements keep changing — which, let's be honest, is most of the time.", keyPoints: ["Waterfall: sequential, plan-driven", "Agile: iterative, flexible sprints", "Scrum: daily standups, 2-week sprints"], index: 1 },
+      { title: "What Is Software Engineering?", content: "Software engineering is all about applying systematic, disciplined approaches to software development. It emerged from the 'software crisis' of the 1960s, when projects kept failing spectacularly - going way over budget and delivering buggy software.", keyPoints: ["Born from the 1960s software crisis", "Systematic approach to building software", "Focuses on quality, cost, and schedule"], index: 0 },
+      { title: "Process Models That Actually Work", content: "From the classic Waterfall model to modern Agile and Scrum, different situations call for different approaches. Waterfall works for well-defined projects, while Agile shines when requirements keep changing - which, let's be honest, is most of the time.", keyPoints: ["Waterfall: sequential, plan-driven", "Agile: iterative, flexible sprints", "Scrum: daily standups, 2-week sprints"], index: 1 },
       { title: "Requirements: Get Them Right First", content: "Requirements engineering is arguably the most critical phase. Getting requirements wrong early costs 100x more to fix later in production. Use cases, user stories, and SRS documents help teams capture exactly what the software should do.", keyPoints: ["Errors here cost 100x more later", "SRS documents capture requirements formally", "Use cases model user interactions"], index: 2 },
-      { title: "Design Patterns Are Your Best Friends", content: "Gang of Four design patterns give developers a shared vocabulary for solving common problems. Whether it's Singleton for single instances, Observer for event handling, or Factory for object creation — patterns make code maintainable and teams productive.", keyPoints: ["Creational, Structural, Behavioral patterns", "Shared vocabulary across teams", "Makes code more maintainable"], index: 3 },
+      { title: "Design Patterns Are Your Best Friends", content: "Gang of Four design patterns give developers a shared vocabulary for solving common problems. Whether it's Singleton for single instances, Observer for event handling, or Factory for object creation - patterns make code maintainable and teams productive.", keyPoints: ["Creational, Structural, Behavioral patterns", "Shared vocabulary across teams", "Makes code more maintainable"], index: 3 },
       { title: "Testing: Break It Before Users Do", content: "Test-Driven Development flips the script: write tests BEFORE code. Combined with unit testing, integration testing, and system testing, automated testing catches 80% of regression bugs and enables continuous integration pipelines.", keyPoints: ["TDD: Red → Green → Refactor cycle", "Automated testing catches 80% of regressions", "Black box + white box techniques"], index: 4 },
       { title: "Managing Projects Like A Pro", content: "COCOMO helps estimate project costs from code size, while risk management identifies threats before they derail your timeline. Configuration management keeps track of every version, and quality assurance ensures the final product actually meets user needs.", keyPoints: ["COCOMO: estimate from KLOC", "Risk management: proactive, not reactive", "Configuration management tracks versions"], index: 5 },
     ];
@@ -265,7 +294,6 @@ export default function PDFApp() {
     setMindMapData(null);
     setReels([]);
     setReelStatus('idle');
-    setSubView('text');
 
     try {
       toast(`Extracting text from ${getFileTypeLabel(fileType)}...`, 'info');
@@ -283,51 +311,70 @@ export default function PDFApp() {
       setExtractedText(text);
       setPdfBase64Data(pdfBase64);
 
-      toast('Generating AI summary...', 'info');
+      toast('Generating AI summary & educational reels...', 'info');
+      setReelStatus('generating');
+
       let summaryOk = false;
       let generatedSummary = null;
-      try {
-        generatedSummary = await summarizeWithGemini(text, pdfBase64);
-        setSummary(generatedSummary);
-        const mapData = extractMindMapData(generatedSummary);
-        setMindMapData(mapData);
-        summaryOk = true;
-        setShowResults(true);
-        setActiveTab('summary');
-        toast('Summary generated! Now creating reels...', 'success');
-      } catch (summaryErr) {
-        console.error('Summary failed:', summaryErr);
-        const isQuota = summaryErr.message?.includes('quota') || summaryErr.message?.includes('429');
-        toast(
-          isQuota ? '⚠️ API daily quota exhausted. Please try again tomorrow.' : 'Summary failed: ' + summaryErr.message,
-          'error'
-        );
-      }
+      let reelsOk = false;
+      let generatedReels = null;
 
-      if (summaryOk) {
-        await new Promise(r => setTimeout(r, 3000));
-      }
-      setReelStatus('generating');
       try {
-        const reelResult = await generateReelsWithGemini(text, pdfBase64);
-        if (reelResult?.length > 0) {
-          setReels(reelResult);
-          setReelStatus('completed');
-          toast('Reels generated!', 'success');
-          // Save complete content (summary + reels) to history
-          if (user && summaryOk && generatedSummary) {
-            saveContent(user.uid, generatedSummary, reelResult);
+        const [summaryResult, reelsResult] = await Promise.allSettled([
+          summarizeWithGemini(text, pdfBase64),
+          generateReelsWithGemini(text, pdfBase64)
+        ]);
+
+        if (summaryResult.status === 'fulfilled') {
+          generatedSummary = summaryResult.value;
+          setSummary(generatedSummary);
+          const mapData = extractMindMapData(generatedSummary);
+          setMindMapData(mapData);
+          summaryOk = true;
+          toast('Summary generated successfully!', 'success');
+        } else {
+          const summaryErr = summaryResult.reason;
+          console.error('Summary failed:', summaryErr);
+          const isQuota = summaryErr.message?.includes('quota') || summaryErr.message?.includes('429');
+          toast(
+            isQuota ? '⚠️ API daily quota exhausted. Please try again tomorrow.' : 'Summary failed: ' + summaryErr.message,
+            'error'
+          );
+        }
+
+        if (reelsResult.status === 'fulfilled') {
+          generatedReels = reelsResult.value;
+          if (generatedReels?.length > 0) {
+            setReels(generatedReels);
+            setReelStatus('completed');
+            reelsOk = true;
+            toast('Educational reels generated!', 'success');
+          } else {
+            setReelStatus('failed');
           }
         } else {
+          const reelErr = reelsResult.reason;
+          console.error('Reels failed:', reelErr);
           setReelStatus('failed');
+          toast('Reels generation failed: ' + reelErr.message, 'error');
         }
-      } catch (reelErr) {
-        console.error('Reels failed:', reelErr);
+
+        // Save complete content (summary + reels) to history if both succeeded
+        if (user && summaryOk && generatedSummary && reelsOk && generatedReels) {
+          const entry = saveContent(user.uid, generatedSummary, generatedReels, [], [], file?.name || '');
+          if (entry) {
+            setCurrentEntryId(entry.id);
+          }
+        }
+
+        setShowResults(true);
+        setActiveTab(summaryOk ? 'summary' : 'reels');
+      } catch (err) {
+        console.error('Generation process failed:', err);
+        toast(err.message || 'Failed to generate content', 'error');
         setReelStatus('failed');
       }
 
-      setShowResults(true);
-      if (!summaryOk) setActiveTab('reels');
     } catch (err) {
       console.error('Generation failed:', err);
       toast(err.message || 'Failed to generate', 'error');
@@ -347,6 +394,9 @@ export default function PDFApp() {
     try {
       const questions = await generateQuizWithGemini(text, pdfBase64Data);
       setQuizQuestions(questions);
+      if (user && currentEntryId) {
+        updateSavedContent(user.uid, currentEntryId, { quiz: questions });
+      }
       toast(`Quiz generated! ${questions.length} questions`, 'success');
     } catch (err) {
       console.error('Quiz generation failed:', err);
@@ -354,7 +404,7 @@ export default function PDFApp() {
     } finally {
       setQuizLoading(false);
     }
-  }, [extractedText, summary, pdfBase64Data]);
+  }, [extractedText, summary, pdfBase64Data, user, currentEntryId]);
 
   const handleFlashcardGenerate = useCallback(async () => {
     // First try generating from summary (no API call needed)
@@ -362,6 +412,9 @@ export default function PDFApp() {
       const cards = generateFlashcardsFromSummary(summary);
       if (cards.length > 0) {
         setFlashcards(cards);
+        if (user && currentEntryId) {
+          updateSavedContent(user.uid, currentEntryId, { flashcards: cards });
+        }
         toast(`Flashcards created! ${cards.length} cards`, 'success');
         return;
       }
@@ -376,6 +429,9 @@ export default function PDFApp() {
     try {
       const cards = await generateFlashcardsWithGemini(text, pdfBase64Data);
       setFlashcards(cards);
+      if (user && currentEntryId) {
+        updateSavedContent(user.uid, currentEntryId, { flashcards: cards });
+      }
       toast(`Flashcards created! ${cards.length} cards`, 'success');
     } catch (err) {
       console.error('Flashcard generation failed:', err);
@@ -383,7 +439,7 @@ export default function PDFApp() {
     } finally {
       setFlashcardLoading(false);
     }
-  }, [summary, extractedText, pdfBase64Data]);
+  }, [summary, extractedText, pdfBase64Data, user, currentEntryId]);
 
   const handleBack = useCallback(() => {
     setShowResults(false);
@@ -391,11 +447,10 @@ export default function PDFApp() {
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative' }}>
-      <div className="grid-bg" />
       <Header fileName={file?.name} showNav />
       <ToastContainer />
 
-      <main style={{ paddingTop: '64px', minHeight: '100vh' }}>
+      <main style={{ paddingTop: '56px', minHeight: '100vh' }}>
         {!showResults ? (
           <>
             <PDFUpload
@@ -411,16 +466,16 @@ export default function PDFApp() {
                   onClick={handleDemo}
                   style={{
                     padding: '10px 22px', borderRadius: 'var(--radius-full)',
-                    background: 'rgba(0, 122, 255, 0.08)',
-                    border: '1px solid rgba(0, 122, 255, 0.2)',
+                    background: 'var(--accent-glow)',
+                    border: '1px solid rgba(212, 148, 10, 0.15)',
                     color: 'var(--accent-light)', fontSize: '13px', fontWeight: 500,
                     fontFamily: 'var(--font-body)', cursor: 'pointer',
                     transition: 'var(--transition-fast)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0, 122, 255, 0.15)'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0, 122, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(0, 122, 255, 0.2)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(212, 148, 10, 0.18)'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-glow)'; e.currentTarget.style.borderColor = 'rgba(212, 148, 10, 0.15)'; }}
                 >
-                  ✨ Try Demo — See sample output
+                  ✨ Try Demo - See sample output
                 </button>
               </div>
             )}

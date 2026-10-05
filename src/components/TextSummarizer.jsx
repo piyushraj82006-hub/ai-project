@@ -43,7 +43,7 @@ export default function TextSummarizer() {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {}
+    } catch { /* ignore clipboard error */ }
   };
 
   return (

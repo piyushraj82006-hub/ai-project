@@ -443,27 +443,30 @@ export default function MindMap({ data, onBack }) {
           { icon: ZoomIn, action: () => handleZoom(1.3), label: 'Zoom in' },
           { icon: ZoomOut, action: () => handleZoom(0.7), label: 'Zoom out' },
           { icon: RotateCcw, action: handleReset, label: 'Reset' },
-        ].map(({ icon: Icon, action, label }) => (
-          <button
-            key={label}
-            onClick={action}
-            title={label}
-            style={{
-              width: '32px', height: '32px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              transition: 'var(--transition-fast)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent-light)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
-          >
-            <Icon size={14} />
-          </button>
-        ))}
+        ].map(({ icon, action, label }) => {
+          const Icon = icon;
+          return (
+            <button
+              key={label}
+              onClick={action}
+              title={label}
+              style={{
+                width: '32px', height: '32px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                transition: 'var(--transition-fast)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent-light)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
+            >
+              <Icon size={14} />
+            </button>
+          );
+        })}
       </div>
 
       {/* ─── Legend ─── */}

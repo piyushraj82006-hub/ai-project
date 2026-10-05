@@ -5,8 +5,7 @@ export default function ReelViewer({ reels, status }) {
   const [current, setCurrent] = useState(0);
   const [prevReels, setPrevReels] = useState(reels);
 
-  // Reset to the first reel when a new reel set arrives. Adjusting state
-  // during render (guarded by prevReels) avoids a setState-in-effect cascade.
+  // Reset to the first reel when a new reel set arrives.
   if (reels !== prevReels) {
     setPrevReels(reels);
     setCurrent(0);

@@ -48,108 +48,73 @@ export default function FlashcardsPage() {
   }, [text]);
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative' }}>
-      <div className="grid-bg" />
+    <div className="tool-page">
       <Header showNav />
       <ToastContainer />
 
-      <main style={{ paddingTop: '64px', minHeight: '100vh' }}>
+      <main className="tool-main">
         {!file ? (
-          <div style={{
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            minHeight: 'calc(100vh - 64px)', padding: '40px 20px',
-          }}>
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <div style={{
-                width: '72px', height: '72px', borderRadius: '50%',
-                background: 'rgba(244, 114, 182, 0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto 20px',
-              }}>
-                <Brain size={32} color="#F472B6" />
-              </div>
-              <h2 style={{
-                fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 4vw, 36px)',
-                fontWeight: 700, marginBottom: '8px',
-              }}>
-                AI <span className="gradient-text">Flashcards</span>
-              </h2>
-              <p style={{ fontSize: '15px', color: 'var(--text-secondary)', maxWidth: '400px' }}>
-                Create flip-card study sets from your documents
-              </p>
+          <div className="tool-split">
+            {/* Left — Info */}
+            <div className="tool-split-left">
+              <div className="tool-split-badge"><Brain size={14} /> Study Tool</div>
+              <h2 className="tool-split-headline">AI <span className="gradient-text">Flashcards</span></h2>
+              <p className="tool-split-subtext">Create flip-card study sets from your documents for fast recall.</p>
+              <ul className="tool-split-features">
+                <li>Auto-generated from your notes</li>
+                <li>Flip-card review mode</li>
+                <li>Supports PDF, EPUB, and DOCX files</li>
+              </ul>
             </div>
 
-            <div
-              onDragOver={e => { e.preventDefault(); setDragging(true); }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); }}
-              onClick={() => document.getElementById('flashcard-file-input')?.click()}
-              style={{
-                width: '100%', maxWidth: '480px', minHeight: '200px',
-                borderRadius: 'var(--radius-xl)',
-                border: `2px dashed ${dragging ? 'var(--accent)' : 'var(--border-color)'}`,
-                background: dragging ? 'rgba(108, 99, 255, 0.08)' : 'var(--bg-secondary)',
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center',
-                gap: '12px', cursor: 'pointer',
-                transition: 'var(--transition-base)',
-              }}
-            >
-              <Upload size={28} color="var(--accent)" />
-              <p style={{ fontSize: '14px', fontWeight: 500 }}>Drag & drop or click to upload</p>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>PDF, EPUB, DOCX up to 50MB</p>
-              <input
-                id="flashcard-file-input"
-                type="file"
-                accept=".pdf,.epub,.docx"
-                onChange={e => e.target.files[0] && handleFile(e.target.files[0])}
-                style={{ display: 'none' }}
-              />
+            {/* Right — Upload */}
+            <div className="tool-split-right">
+              <div
+                className={`tool-dropzone ${dragging ? 'drag-over' : ''}`}
+                onDragOver={e => { e.preventDefault(); setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); }}
+                onClick={() => document.getElementById('flashcard-file-input')?.click()}
+              >
+                <Upload size={28} className="tool-dropzone-icon" />
+                <p>Drag & drop or click to upload</p>
+                <span>PDF, EPUB, DOCX up to 50MB</span>
+                <input
+                  id="flashcard-file-input"
+                  type="file"
+                  accept=".pdf,.epub,.docx"
+                  onChange={e => e.target.files[0] && handleFile(e.target.files[0])}
+                  style={{ display: 'none' }}
+                />
+              </div>
             </div>
           </div>
         ) : (
-          <div style={{ height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '10px 20px', borderBottom: '1px solid var(--border-color)',
-              background: 'var(--bg-card)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ height: 'calc(100vh - 56px)', display: 'flex', flexDirection: 'column' }}>
+            <div className="tool-filebar">
+              <div className="tool-filebar-name">
                 <FileText size={16} color="var(--accent)" />
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{file.name}</span>
+                <span>{file.name}</span>
               </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div className="tool-filebar-actions">
                 <button
+                  className="tool-btn-generate"
                   onClick={handleGenerate}
                   disabled={loading || !text}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '8px 16px', borderRadius: 'var(--radius-full)',
-                    background: loading ? 'rgba(108, 99, 255, 0.2)' : 'var(--gradient-accent)',
-                    border: 'none', color: loading ? 'var(--text-muted)' : '#fff',
-                    fontSize: '12px', fontWeight: 600,
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                  }}
                 >
                   <Sparkles size={14} />
                   {loading ? 'Generating...' : 'Generate Flashcards'}
                 </button>
                 <button
+                  className="tool-btn-secondary"
                   onClick={() => { setFile(null); setText(''); setCards([]); }}
-                  style={{
-                    padding: '8px 14px', borderRadius: 'var(--radius-full)',
-                    background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
-                    color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 500,
-                    cursor: 'pointer',
-                  }}
                 >
                   Change File
                 </button>
               </div>
             </div>
 
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div className="tool-content">
               <Flashcards
                 cards={cards}
                 onGenerate={handleGenerate}

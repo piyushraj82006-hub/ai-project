@@ -4,14 +4,14 @@ import courseData from '../../courseData.json';
 import {
   ArrowLeft, BookOpen, PlayCircle, HelpCircle,
   Clock, ExternalLink, ChevronDown, ChevronUp,
-  Youtube, Lightbulb, CheckCircle2
+  Video, Lightbulb, CheckCircle2
 } from 'lucide-react';
 
 export default function CourseDetail() {
   const { courseCode } = useParams();
   const navigate = useNavigate();
 
-  // Load course directly from local JSON — no API, no Firestore
+  // Load course directly from local JSON - no API, no Firestore
   const course = courseData.courses.find(c => c.code === courseCode) || null;
 
   const [activeTab, setActiveTab] = useState('syllabus');
@@ -57,8 +57,6 @@ export default function CourseDetail() {
 
   return (
     <div className="course-detail-page">
-      <div className="dashboard-bg-glow" />
-
       {/* Header */}
       <header className="course-header">
         <button className="back-btn" onClick={() => navigate('/')}>
@@ -127,7 +125,7 @@ export default function CourseDetail() {
                     </div>
                     <div className="module-actions">
                       <span className="module-hours"><Clock size={13} /> {mod.hours}h</span>
-                      {hasYt && <span className="module-badge yt-badge"><Youtube size={12} /> {ytByModule[index].length}</span>}
+                      {hasYt && <span className="module-badge yt-badge"><Video size={12} /> {ytByModule[index].length}</span>}
                       {hasQa && <span className="module-badge qa-badge"><HelpCircle size={12} /> {qByModule[index].length} Q</span>}
                       {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </div>
@@ -164,7 +162,7 @@ export default function CourseDetail() {
                             className={`mod-action-btn yt-btn ${moduleView[index] === 'yt' ? 'active' : ''}`}
                             onClick={() => toggleModuleView(index, 'yt')}
                           >
-                            <Youtube size={15} />
+                            <Video size={15} />
                             {moduleView[index] === 'yt' ? 'Hide Videos' : `Watch Videos (${ytByModule[index].length})`}
                           </button>
                         )}
@@ -193,7 +191,7 @@ export default function CourseDetail() {
                               rel="noreferrer"
                               className="inline-yt-link"
                             >
-                              <Youtube size={18} color="#FF0000" />
+                              <Video size={18} color="#FF0000" />
                               <span>{link.title}</span>
                               <ExternalLink size={14} className="ext-icon" />
                             </a>
@@ -256,7 +254,7 @@ export default function CourseDetail() {
             {course.youtubeLinks?.length > 0 ? (
               <>
                 <p className="section-note">
-                  <Youtube size={14} /> Curated video resources for each module.
+                  <Video size={14} /> Curated video resources for each module.
                 </p>
                 {course.modules?.map((mod, modIdx) => {
                   const links = ytByModule[modIdx] || [];

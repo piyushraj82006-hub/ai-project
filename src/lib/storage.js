@@ -6,7 +6,7 @@ function getStore() {
   } catch { return {}; }
 }
 
-export function saveContent(userId, summary, reels = []) {
+export function saveContent(userId, summary, reels = [], quiz = [], flashcards = [], fileName = '') {
   const store = getStore();
   if (!store[userId]) store[userId] = [];
   const entry = {
@@ -14,13 +14,29 @@ export function saveContent(userId, summary, reels = []) {
     title: summary.documentTitle || summary.title || 'Untitled Document',
     createdAt: new Date().toISOString(),
     summary,
-    reels
+    reels,
+    quiz,
+    flashcards,
+    fileName
   };
   store[userId].unshift(entry);
   // Keep max 20 summaries
   if (store[userId].length > 20) store[userId] = store[userId].slice(0, 20);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   return entry;
+}
+
+export function updateSavedContent(userId, id, updates) {
+  const store = getStore();
+  if (store[userId]) {
+    store[userId] = store[userId].map(entry => {
+      if (entry.id === id) {
+        return { ...entry, ...updates };
+      }
+      return entry;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  }
 }
 
 export function getSummaries(userId) {

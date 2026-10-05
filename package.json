@@ -11,13 +11,14 @@
   },
   "dependencies": {
     "d3": "^7.9.0",
-    "epubjs": "^0.3.93",
+    "epubjs": "^0.4.2",
     "firebase": "^12.11.0",
     "freebuff": "^0.0.149",
     "html2pdf.js": "^0.14.0",
     "katex": "^0.16.44",
     "lucide-react": "^1.7.0",
     "mammoth": "^1.12.0",
+    "motion": "^13.1.0",
     "pdfjs-dist": "^4.4.168",
     "playwright": "^1.58.2",
     "react": "^19.2.4",
@@ -26,8 +27,7 @@
     "react-router-dom": "^7.13.2",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0",
-    "three": "^0.185.1"
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

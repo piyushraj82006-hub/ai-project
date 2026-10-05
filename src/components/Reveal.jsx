@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Reveal — fade/slide content in when it scrolls into view.
+ * Reveal - fade/slide content in when it scrolls into view.
  * Lightweight IntersectionObserver wrapper; respects reduced motion via CSS.
  */
 export default function Reveal({ children, delay = 0, className = '' }) {

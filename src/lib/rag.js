@@ -127,36 +127,54 @@ export async function chatWithRAG(query, chatHistory, vectorStore, pdfBase64 = n
     `You are an expert strict AI assistant inside a study application. Answer the user's question using ONLY the provided document context.` +
     `\nIf the document does not contain the answer, you MUST specifically say exactly: "Answer not found in the provided document". Do not hallucinate external information. Do NOT apologize. Keep explanations concise, educational, and accurate.`;
 
-  // --- Load Balancing: Attempt to offload heavy text generation to Groq (Llama 3) ---
-  const groqKey = import.meta.env.VITE_GROQ_API_KEY;
-  // Groq cannot read pure raw image base64 arrays. If pdfBase64 exists, we MUST use Gemini Vision.
-  if (groqKey && !pdfBase64) {
+  // --- Load Balancing / Fallback: Attempt to offload text generation to OpenRouter (dots-3) ---
+  const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+  // OpenRouter dots-3 cannot read pure raw image base64 arrays natively. If pdfBase64 exists, we MUST use Gemini Vision.
+  if (orKey && !pdfBase64) {
     try {
-      const groqPayload = {
-        model: 'llama-3.1-8b-instant',
+      const orPayload = {
+        model: 'dots-studio/dots-3-note-preview:free',
         messages: [
           { role: 'system', content: systemInstruction },
           ...chatHistory.map(msg => ({ role: msg.role === 'ai' ? 'assistant' : 'user', content: msg.content })),
           { role: 'user', content: contextSnippet ? `DOCUMENT CONTEXT EXCERPTS:\n${contextSnippet}\n\nQUESTION: ${query}` : `QUESTION: ${query}` }
         ],
+        reasoning: { enabled: true },
         temperature: 0.1
       };
       
-      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` },
-        body: JSON.stringify(groqPayload)
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${orKey}`,
+          'HTTP-Referer': 'https://scroll-d95c6.web.app',
+          'X-Title': 'Scroll.io'
+        },
+        body: JSON.stringify(orPayload)
       });
-      const groqData = await groqRes.json();
-      if (groqRes.ok && groqData.choices?.[0]?.message?.content) {
-        return groqData.choices[0].message.content;
+      const orData = await orRes.json();
+      
+      if (orRes.ok && orData.choices?.[0]?.message) {
+        const msg = orData.choices[0].message;
+        let content = msg.content;
+        
+        // dots-3 might return null content with reasoning details
+        if (!content && msg.reasoning_details) {
+          content = msg.reasoning_details.filter(r => r.type === 'text').map(r => r.text).join('');
+        }
+        
+        if (content) {
+          // Strip <think> tags before showing to user
+          return content.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '').trim();
+        }
       }
-      throw new Error(groqData.error?.message || JSON.stringify(groqData));
+      throw new Error(orData.error?.message || JSON.stringify(orData));
     } catch (e) {
-      throw new Error(`Groq API Error: ${e.message}`);
+      console.warn(`[OpenRouter dots-3] Failed for chatWithRAG, falling back to Gemini: ${e.message}`);
     }
   } else if (pdfBase64) {
-    console.warn('Scanned PDF detected. Groq Vision bypassed natively to Gemini 2.0 Flash.');
+    console.log('Scanned PDF detected. OpenRouter bypassed natively to Gemini 2.0 Flash.');
   }
 
   // --- Fallback / Baseline: Execute natively on Gemini 2.0 Flash ---
@@ -178,7 +196,7 @@ export async function chatWithRAG(query, chatHistory, vectorStore, pdfBase64 = n
     generationConfig: { temperature: 0.1 } // Very low temp to enforce strict factual recall without hallucination
   };
 
-  const response = await fetch(`${GEMINI_BASE_URL}/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+  const response = await fetch(`${GEMINI_BASE_URL}/gemini-3.6-flash:generateContent?key=${apiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)

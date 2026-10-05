@@ -3,7 +3,7 @@
    ============================================ */
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const MODELS = ['gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash'];
 
 function getApiUrl(model = MODELS[0]) {
   return `${GEMINI_BASE_URL}/${model}:generateContent`;
@@ -69,7 +69,7 @@ async function callAIWithFallback(apiKeys, systemPrompt, userPrompt, parseMode =
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            system_instruction: {
+            systemInstruction: {
               parts: [{ text: systemPrompt }]
             },
             contents: [{
@@ -112,66 +112,151 @@ async function callAIWithFallback(apiKeys, systemPrompt, userPrompt, parseMode =
     }
   }
 
-  // Groq Fallback (cannot process native PDFs)
-  const groqKey = import.meta.env.VITE_GROQ_API_KEY;
-  if (groqKey && !pdfBase64) {
+  // - Groq Fallback (Qwen 3.6-27B) - cannot process native PDFs -
+  const groqKeys = getGroqApiKeys();
+  if (groqKeys.length > 0 && !pdfBase64) {
+    for (const groqKey of groqKeys) {
+      if (!groqKey) continue;
+      try {
+        const groqBody = {
+          model: 'qwen/qwen3.6-27b',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.3,
+        };
+
+        if (parseMode === 'object') {
+          groqBody.response_format = { type: 'json_object' };
+        }
+
+        console.log(`[Groq] Gemini exhausted. Trying Groq (qwen/qwen3.6-27b) with key starting in ${groqKey.substring(0, 10)}...`);
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${groqKey}`
+          },
+          body: JSON.stringify(groqBody)
+        });
+
+        if (response.status === 429 || !response.ok) {
+          const err = await response.json().catch(() => ({}));
+          const msg = err.error?.message || `Groq API error: ${response.status}`;
+          console.warn(`[Groq] Rate limited or failed: ${msg}. Trying next key or model...`);
+          lastError = new Error(msg);
+          continue;
+        }
+
+        const data = await response.json();
+        const rawText = data.choices?.[0]?.message?.content;
+        if (!rawText) throw new Error('No response from Groq API');
+
+        // Strip <think>...</think> blocks that Qwen returns
+        const cleanedText = rawText.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+        let parsedResponse;
+        try {
+          parsedResponse = JSON.parse(cleanedText);
+        } catch {
+          const pattern = parseMode === 'array' ? /\[[\s\S]*\]/ : /\{[\s\S]*\}/;
+          const match = cleanedText.match(pattern);
+          if (match) parsedResponse = JSON.parse(match[0]);
+          else throw new Error('Failed to parse Groq response as JSON');
+        }
+
+        if (parseMode === 'array' && !Array.isArray(parsedResponse)) {
+          return parsedResponse.reels || parsedResponse.data || Object.values(parsedResponse)[0] || [];
+        }
+        return parsedResponse;
+
+      } catch (err) {
+        console.warn(`[Groq] Key failed: ${err.message}. Trying next options...`);
+        lastError = err;
+      }
+    }
+  }
+
+  // - OpenRouter Fallback (dots-3 reasoning model) - free tier, no PDF support -
+  const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+  if (orKey && !pdfBase64) {
     try {
-      const groqBody = {
-        model: 'llama-3.3-70b-versatile',
+      console.log(`[OpenRouter] Groq exhausted. Falling back to dots-3 reasoning model...`);
+
+      const orBody = {
+        model: 'dots-studio/dots-3-note-preview:free',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: 'user',   content: userPrompt   }
         ],
+        reasoning: { enabled: true },
         temperature: 0.3,
       };
 
-      if (parseMode === 'object') {
-        groqBody.response_format = { type: 'json_object' };
-      }
+      // dots-3 with reasoning works best without json_object enforcement
+      // We parse manually from the response text
 
-      console.log(`[Groq] Gemini failed or exhausted. Falling back to Groq (llama-3.3-70b-versatile)...`);
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${groqKey}`
+          'Authorization': `Bearer ${orKey}`,
+          'HTTP-Referer': 'https://scroll-d95c6.web.app',
+          'X-Title': 'Scroll.io'
         },
-        body: JSON.stringify(groqBody)
+        body: JSON.stringify(orBody)
       });
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error(err.error?.message || `OpenAI API error: ${response.status}`);
+        throw new Error(err.error?.message || `OpenRouter API error: ${response.status}`);
       }
 
       const data = await response.json();
-      const rawText = data.choices?.[0]?.message?.content;
-      if (!rawText) throw new Error('No response from OpenAI API');
-      
-      let parsedResponse;
-      try {
-        parsedResponse = JSON.parse(rawText);
-      } catch {
-        const pattern = parseMode === 'array' ? /\[[\s\S]*\]/ : /\{[\s\S]*\}/;
-        const match = rawText.match(pattern);
-        if (match) parsedResponse = JSON.parse(match[0]);
-        else throw new Error('Failed to parse OpenAI response as JSON');
+      const msg = data.choices?.[0]?.message;
+
+      // dots-3 may return null content when the answer is in reasoning_details
+      // Try content first, then fall back to reasoning_details text
+      let rawText = msg?.content;
+      if (!rawText && msg?.reasoning_details?.length) {
+        rawText = msg.reasoning_details
+          .filter(r => r.type === 'text')
+          .map(r => r.text)
+          .join('');
       }
 
-      // OpenAI strictly enforces returning an object if type is json_object.
-      // If we expect an array (for reels), OpenAI will likely wrap it in an object like { "reels": [...] }
+      if (!rawText) throw new Error('No usable response from OpenRouter dots-3');
+
+      // Strip <think>...</think> and other reasoning wrappers
+      const cleaned = rawText
+        .replace(/<think>[\s\S]*?<\/think>/gi, '')
+        .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
+        .trim();
+
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(cleaned);
+      } catch {
+        const pattern = parseMode === 'array' ? /\[[\s\S]*\]/ : /\{[\s\S]*\}/;
+        const match = cleaned.match(pattern);
+        if (match) parsedResponse = JSON.parse(match[0]);
+        else throw new Error('Failed to parse OpenRouter response as JSON');
+      }
+
       if (parseMode === 'array' && !Array.isArray(parsedResponse)) {
         return parsedResponse.reels || parsedResponse.data || Object.values(parsedResponse)[0] || [];
       }
       return parsedResponse;
 
     } catch (err) {
-      console.error(`[OpenAI Fallback] Failed:`, err.message);
-      lastError = new Error(`Both Gemini and OpenAI failed. Last error: ${err.message}`);
+      console.error(`[OpenRouter] Failed:`, err.message);
+      lastError = new Error(`All AI providers exhausted. Last error: ${err.message}`);
     }
   }
 
-  throw lastError || new Error('All Gemini models failed and no OpenAI fallback configured.');
+
+  throw lastError || new Error('All AI models failed. Please check your API keys.');
 }
 
 function parseGeminiResponse(data, parseMode) {
@@ -192,6 +277,12 @@ export function getApiKeys() {
   const rawKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!rawKey) return [];
   // Split by comma and remove whitespace
+  return rawKey.split(',').map(k => k.trim()).filter(Boolean);
+}
+
+export function getGroqApiKeys() {
+  const rawKey = import.meta.env.VITE_GROQ_API_KEY;
+  if (!rawKey) return [];
   return rawKey.split(',').map(k => k.trim()).filter(Boolean);
 }
 
@@ -332,10 +423,10 @@ Each reel must have this structure:
 }
 
 Rules:
-- Each reel covers a DIFFERENT section — no overlap
+- Each reel covers a DIFFERENT section - no overlap
 - Use conversational but educational tone
 - 2-4 keyPoints per reel
-- Content should be self-contained — each reel is understandable on its own
+- Content should be self-contained - each reel is understandable on its own
 - Make titles catchy and engaging
 - Cover the MOST IMPORTANT concepts from the document`;
 

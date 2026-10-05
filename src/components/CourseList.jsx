@@ -10,7 +10,7 @@ export default function CourseList({ courses, onEnroll, enrolledCourseIds = [], 
         <BookOpen size={36} strokeWidth={1} />
         {exploreBranch || exploreSemester ? (
           <>
-            <p>No courses yet for <strong>{exploreBranch || 'this branch'}</strong>{exploreSemester ? ` — Semester ${exploreSemester}` : ''}.</p>
+            <p>No courses yet for <strong>{exploreBranch || 'this branch'}</strong>{exploreSemester ? ` - Semester ${exploreSemester}` : ''}.</p>
             <p style={{ fontSize: '12px', opacity: 0.6 }}>Courses will appear here once they are added to the system.</p>
           </>
         ) : (
